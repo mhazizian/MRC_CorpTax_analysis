@@ -2,16 +2,17 @@ clear
 graph set window fontface "B Nazanin"
 graph drop _all
 
-local dir "~\Documents\Majlis RC\data\tax_return\sharif"
-use "`dir'\Mohasebe_Maliat.dta"
+local dir "D:\Data_Output\Hoghooghi"
+// local dir "~\Documents\Majlis RC\data\tax_return\sharif"
+use "`dir'\Mohasebe_Maliat.dta", clear
 
 
 gsort -T26_R01 
 egen flag = tag(id actyear)
-// duplicates drop id actyear flag, force
+duplicates drop id actyear flag, force
 drop if flag == 0
 
-merge 1:1 id actyear using "`dir'\Sanim.dta"
+// merge 1:1 id actyear using "`dir'\Sanim.dta"
 
 // ##### Gen <profit_ebrazi> & <tax_ebrazi>
 
@@ -30,13 +31,13 @@ replace profit_ebrazi = . if missing(T26_R01) // & missing(T26_R02) & missing(T2
 gen etr_ebrazi  = tax_ebrazi / profit_ebrazi
 gen etr_ebrazi2 = tax_ebrazi / T26_R14
 
-gen etr_ghati  = maliyat_ghati / profit_ebrazi 
-gen etr_ghati2 = maliyat_ghati / daramad_ghati
-gen etr_ghati3 = maliyat_ghati / daramad_ebrazi
+gen etr_ghati  = maliat_ghatee / profit_ebrazi 
+// gen etr_ghati2 = maliyat_ghati / daramad_ghati
+// gen etr_ghati3 = maliyat_ghati / daramad_ebrazi
 
 
 gen lost_income_ebrazi = (profit_ebrazi * 0.25 - tax_ebrazi)  / 10 / 1000 / 1000 / 1000 // Billion Toman
-gen lost_income_ghati  = (profit_ebrazi * 0.25 - maliyat_ghati)  / 10 / 1000 / 1000 / 1000
+gen lost_income_ghati  = (profit_ebrazi * 0.25 - maliat_ghatee)  / 10 / 1000 / 1000 / 1000 // Billion Toman
 
 // ##########################################################################################################
 // ##################### Checking for Odd(!) corporate with maliyat_ghati > maliyat_ebrazi ##################
@@ -48,31 +49,29 @@ gen lost_income_ghati  = (profit_ebrazi * 0.25 - maliyat_ghati)  / 10 / 1000 / 1
 // tab actyear if maliyat_ghati < tax_ebrazi & abs(maliyat_ghati - maliyat_ebrazi) > 0.01     & !missing(daramad_ghati)  & !missing(tax_ebrazi)
 
 
-gen odd_corp = (maliyat_ghati < tax_ebrazi & abs(maliyat_ghati - maliyat_ebrazi) > 0.01 * maliyat_ebrazi & !missing(maliyat_ghati) & !missing(tax_ebrazi))
-gen odd_corp_ex = (odd_corp == 1) & (maliyat_ghati > 0)
-gen is_not_audited = maliyat_ghati == 0 & odd_corp == 1
+gen odd_corp = (maliat_ghatee < tax_ebrazi & abs(maliat_ghatee - tax_ebrazi) > 0.01 * tax_ebrazi & !missing(maliat_ghatee) & !missing(tax_ebrazi))
+gen odd_corp_ex = (odd_corp == 1) & (maliat_ghatee > 0)
+gen is_not_audited = (maliat_ghatee == 0) & (odd_corp == 1)
 
-tab actyear odd_corp_ex, row  // we have 8403 (after cleaning) obs which does not make sense!!!! (after assuming maliyat_ghati==0 means no clear result yet.)
-tab actyear odd_corp_ex [w=profit_ebrazi] if profit_ebrazi >=0, row
-// hist etr_ebrazi if odd_corp_ex == 1 & etr_ebrazi < 0.5 & etr_ebrazi >= 0, title("ETR dist for odd corporations")
+tab actyear odd_corp_ex, row  // in total, 21000 obs. with more weight in 1393 - 1397
+tab actyear odd_corp_ex [w=profit_ebrazi] if profit_ebrazi >=0, row // TODO: years 1397, 1396 must be checked. in total, 1 percent of total profit.
+hist etr_ebrazi if odd_corp_ex == 1 & etr_ebrazi < 0.5 & etr_ebrazi >= 0, title("ETR dist for odd corporations")
+
+
 
 
 // corporate which has not gotten ghati yet...
-tab actyear is_not_audited, row // 1.62% of all records.
-tab actyear is_not_audited [w=profit_ebrazi] if profit_ebrazi >= 0, row // 0.32% of total value of all records.
-tab is_not_audited [w=profit_ebrazi] if profit_ebrazi >= 0
-
+tab actyear is_not_audited, row // 0.09% of all records.
+tab actyear is_not_audited [w=profit_ebrazi] if profit_ebrazi >= 0, row // 0.07% of total profit of all records.
 
 // #########################################################################################################
 // ############################################# Cleaning ##################################################
 
 drop if missing(actyear)
-tab actyear if _merge == 1 | _merge == 2
-drop if _merge == 2
-drop if _merge == 1 // date before 1396 are not that reliable...
-drop if actyear < 1396
 
-drop if missing(tax_ebrazi) & missing(profit_ebrazi)
+// drop if actyear < 1396
+
+drop if missing(tax_ebrazi) & missing(profit_ebrazi) // TODO: years 1391 to 1394 must be checked.
 
 tab actyear
 
@@ -84,8 +83,8 @@ drop if profit_ebrazi < 0
 
 
 // Odd corporations:
-tab actyear is_not_audited, row // 1.62% of all records.
-tab actyear is_not_audited [w=profit_ebrazi], row // 0.37% of total value of all records.
+tab actyear is_not_audited, row // 0.16% of all records.
+tab actyear is_not_audited [w=profit_ebrazi], row // 0.07% of total value of all records.
 
 // drop if is_not_audited
 tab actyear if is_not_audited
@@ -95,20 +94,20 @@ tab actyear
 	
 // ################################# dramad ghati / daramad ebrazi  #########################################
 
-gen inta_work4 = daramad_ghati / daramad_ebrazi
-
-hist inta_work4 if inta_work4 < 5, percent name(h3) ///
-	title("daramad_ghati / daramad_ebrazi (<5)")
-
-hist inta_work4 if inta_work4 < 50, percent name(h4) bin(20) ///
-	title("daramad_ghati / daramad_ebrazi (<50)")
+// gen inta_work4 = daramad_ghati / daramad_ebrazi
+//
+// hist inta_work4 if inta_work4 < 5, percent name(h3) ///
+// 	title("daramad_ghati / daramad_ebrazi (<5)")
+//
+// hist inta_work4 if inta_work4 < 50, percent name(h4) bin(20) ///
+// 	title("daramad_ghati / daramad_ebrazi (<50)")
 
 
 // ##########################################################################################################
 // ############################# Checking ETR distibution ###################################################
 
 
-//tab actyear if missing(daramad_ghati) & !missing(maliyat_ghati) & !missing(T26_R01)
+//tab actyear if missing(daramad_ghati) & !missing(maliat_ghatee) & !missing(T26_R01)
 tab actyear if missing(T26_R01)
 
 tab actyear if T26_R01 < 0
@@ -141,17 +140,6 @@ cumul etr_ghati, gen(etr_ghati_cumul1)
 sort etr_ghati_cumul1
 line etr_ghati_cumul1 etr_ghati if etr_ghati < 0.251 & etr_ghati >= 0, name(c3) ylab(, grid) xlab(, grid) ytitle(سهم از شرکت‌ها) xtitle(نرخ موثر مالیات ابرازی) ///
 	title("maliyat_ghati / profit_ebrazi")
-
-
-cumul etr_ghati2, gen(etr_ghati_cumul2)
-sort etr_ghati_cumul2
-line etr_ghati_cumul2 etr_ghati2 if etr_ghati2 < 0.251 , name(c4) ylab(, grid) xlab(, grid) ytitle(سهم از شرکت‌ها) xtitle(نرخ موثر مالیات ابرازی)  ///
-	title("maliyat_ghati / daramad_ghati")
-
-cumul etr_ghati3, gen(etr_ghati_cumul3)
-sort etr_ghati_cumul3
-line etr_ghati_cumul3 etr_ghati3 if etr_ghati3 < 0.251 & etr_ghati3 >= 0, name(c5) ylab(, grid) xlab(, grid) ytitle(سهم از شرکت‌ها) xtitle(نرخ موثر مالیات ابرازی)  ///
-	title("maliyat_ghati / daramad_ebrazi")
 
 	
 // #################################################################################################
@@ -258,7 +246,7 @@ restore
 // #################################################################################################
 // ######################################## ETR in specific year (CDF) #############################
 
-local year 1399
+local year 1398
 graph drop _all
 
 preserve
@@ -299,7 +287,7 @@ preserve
 	
 	
 	drop if is_not_audited == 1
-	drop if missing(maliyat_ghati)
+	drop if missing(maliat_ghatee)
 	
 	tab actyear if !missing(etr_ghati)
 	
