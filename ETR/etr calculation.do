@@ -1,6 +1,8 @@
 clear
 graph set window fontface "B Nazanin"
 // ssc install egenmore
+// ssc inst _gwtmean, replace
+
 graph drop _all
 
 local dir "D:\Data_Output\Hoghooghi"
@@ -241,9 +243,22 @@ replace lp_is_etr_ebrazi = . if missing(etr_ebrazi)
 egen lp_percent_etr_ebrazi = mean(lp_is_etr_ebrazi), by(actyear)
 egen lp_percent_etr_ebrazi_w = wtmean(lp_is_etr_ebrazi), by(actyear) weight(profit_ebrazi)
 
+//
+// tabdisp actyear, cellvar(etr_ebrazi_agr_yearly sum_lost_income_ebrazi)
+// tabdisp actyear, cellvar(lp_sum_lost_income_ebrazi lp_percent_etr_ebrazi lp_percent_etr_ebrazi_w)
 
-tabdisp actyear, cellvar(etr_ebrazi_agr_yearly sum_lost_income_ebrazi)
-tabdisp actyear, cellvar(lp_sum_lost_income_ebrazi lp_percent_etr_ebrazi lp_percent_etr_ebrazi_w)
+preserve
+
+	keep actyear ///
+		etr_ebrazi_agr_yearly ///
+		sum_lost_income_ebrazi ///
+		lp_sum_lost_income_ebrazi ///
+		lp_percent_etr_ebrazi ///
+		lp_percent_etr_ebrazi_w
+	duplicates drop
+	export excel "Corp - ETR timeSeries - topCorp - Ebrazi.xlsx", firstrow(varl) replace
+
+restore
 
 
 // ################# GHATI ##################
@@ -270,8 +285,19 @@ preserve
 	
 	
 	
-	tabdisp actyear, cellvar(etr_ghati_agr_yearly sum_lost_income_ghati)
-	tabdisp actyear, cellvar(lp_sum_lost_income_ghati lp_percent_etr_ghati lp_percent_etr_ghati_w)
+// 	tabdisp actyear, cellvar(etr_ghati_agr_yearly sum_lost_income_ghati)
+// 	tabdisp actyear, cellvar(lp_sum_lost_income_ghati lp_percent_etr_ghati lp_percent_etr_ghati_w)
+	
+	
+	keep actyear ///
+		etr_ghati_agr_yearly ///
+		sum_lost_income_ghati ///
+		lp_sum_lost_income_ghati ///
+		lp_percent_etr_ghati ///
+		lp_percent_etr_ghati_w
+	duplicates drop
+	export excel "Corp - ETR timeSeries - topCorp - Ghati.xlsx", firstrow(varl) replace
+
 restore	
 
 
