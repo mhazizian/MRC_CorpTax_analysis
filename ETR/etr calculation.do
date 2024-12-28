@@ -1,9 +1,10 @@
 clear
 graph set window fontface "B Nazanin"
+// ssc install egenmore
 graph drop _all
 
-// local dir "D:\Data_Output\Hoghooghi"
-local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+local dir "D:\Data_Output\Hoghooghi"
+// local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 use "`dir'\Mohasebe_Maliat.dta", clear
 
 merge 1:1 trace_id actyear using "`dir'\Legal_Person_Information.dta"
@@ -99,7 +100,7 @@ egen avg_profit_percentile = mean(profit_ebrazi) if is_not_audited == 0, by(acty
 
 // ######################################## ETR in specific year (CDF) #################################
 
-local year 1401
+local year 1400
 graph drop _all
 
 preserve
@@ -112,25 +113,29 @@ preserve
 	sort etr_ebrazi_cumul
 	
 	line etr_ebrazi_cumul etr_ebrazi if etr_ebrazi < 0.251, name(CE0_`year') ylab(, grid) xlab(, grid) ytitle(سهم از تعداد شرکت‌ها) xtitle(نرخ موثر مالیات ابرازی) title("سال `year'")
+	graph export CE0_`year'.png, as(png) replace
 
 	hist etr_ebrazi if etr_ebrazi < 0.251, percent name(CE1_`year') bin(25) ylab(, grid) xlab(, grid) ytitle(سهم از تعداد شرکت‌ها (درصد)) xtitle(نرخ موثر مالیات ابرازی) title(سال `year')
-
+	graph export CE1_`year'.png, as(png) replace
 	
 	cumul etr_ebrazi [w=profit_ebrazi] , gen(etr_ebrazi_cumul_w)
 	sort etr_ebrazi_cumul_w
 	line etr_ebrazi_cumul_w etr_ebrazi if etr_ebrazi < 0.251, name(CE2_`year') ylab(, grid) xlab(, grid) ///
 		ytitle(سهم از مجموع سود قبل از مالیات شرکت‌ها) xtitle(نرخ موثر مالیات ابرازی) title("سال `year'")
-		
+	graph export CE2_`year'.png, as(png) replace	
+	
 	hist etr_ebrazi [w=profit_ebrazi] if etr_ebrazi < 0.251, percent name(CE3_`year') bin(25) ///
 		ylab(, grid) xlab(, grid) ytitle(سهم از مجموع سود قبل از مالیات شرکت‌ها) xtitle(نرخ موثر مالیات ابرازی) title(سال `year')
-
+	graph export CE3_`year'.png, as(png) replace
 		
 		
 	hist deciles_100 if etr_ebrazi > 0.24 & !missing(etr_ebrazi), percent name(CE4_`year') bin(20) title("سال `year'") ytitle(درصد) xtitle(صدک شرکت‌ها)
 	
 	hist etr_ebrazi2 if deciles_100 == 100, percent name(CE5_`year') bin(26) title("سال `year'") ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی)
+	graph export CE5_`year'.png, as(png) replace
+	
 	hist etr_ebrazi2 if deciles_100 <= 20 & etr_ebrazi < 0.251, percent name(CE6_`year') bin(25) title("سال `year'") ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی)
-
+	graph export CE6_`year'.png, as(png) replace
 	
 restore
 
@@ -146,27 +151,33 @@ preserve
 	// line etr_ghati_cumul_w etr_ebrazi, ylab(, grid) ytitle("") xlab(, grid)
 	line etr_ghati_cumul etr_ghati if etr_ghati < 0.251, name(CG0_`year') ylab(, grid) xlab(, grid) ///
 			ytitle(سهم از تعداد شرکت‌ها) xtitle(نرخ موثر مالیات قطعی) title("سال `year'") yscale(r(0 1)) ylabel(0 0.2 0.4 0.6 0.8 1)
+	graph export CG0_`year'.png, as(png) replace		
 			
 	hist etr_ghati if etr_ghati < 0.251, percent name(CG1_`year') bin(25) ylab(, grid) xlab(, grid) ytitle(سهم از تعداد شرکت‌ها (درصد)) xtitle(نرخ موثر مالیات قطعی) title(سال `year')
-	
+	graph export CG1_`year'.png, as(png) replace
 
 	cumul etr_ghati [w=profit_ebrazi] , gen(etr_ghati_cumul_w)
 	sort etr_ghati_cumul_w
 	line etr_ghati_cumul_w etr_ghati  if etr_ghati < 0.251, name(CG2_`year') ylab(, grid) xlab(, grid) ///
 			ytitle(سهم از مجموع سود قبل از مالیات شرکت‌ها) xtitle(نرخ موثر مالیات قطعی) title("سال `year'") yscale(r(0 1))
+	graph export CG2_`year'.png, as(png) replace		
+			
 			
 	hist etr_ghati [w=profit_ebrazi] if etr_ghati < 0.251, percent name(CG3_`year') bin(25) ///
 		ylab(, grid) xlab(, grid) ytitle(سهم از مجموع سود قبل از مالیات شرکت‌ها) xtitle(نرخ موثر مالیات قطعی) title(سال `year')
-		
+	graph export CG3_`year'.png, as(png) replace
 		
 	hist deciles_100 if etr_ghati > 0.24, percent name(CG4_`year') bin(50) title("سال `year'") ytitle(درصد) xtitle(صدک شرکت‌ها)
 	
 			
 	hist etr_ghati2 if deciles_100 == 100, percent name(CG5_`year') bin(26) title("سال `year'") ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی)
-	hist etr_ghati2 if deciles_100 <= 20 & etr_ebrazi < 0.251, percent name(CG6_`year') bin(25) title("سال `year'") ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی)
+	graph export CG5_`year'.png, as(png) replace
 	
+	hist etr_ghati2 if deciles_100 <= 20 & etr_ebrazi < 0.251, percent name(CG6_`year') bin(25) title("سال `year'") ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی)
+	graph export CG6_`year'.png, as(png) replace
 
 restore
+
 	
 // ################################# Sector Analisys ####################################
 
@@ -183,16 +194,29 @@ gen etr_ghati_by_activity  = t_tax_ghati_by_activity  / t_profit_ebrazi_by_activ
 egen sum_lost_income_ebrazi_by_act = sum(lost_income_ebrazi), by(actyear T00_ActivityTypeName)
 egen sum_lost_income_ghati_by_act  = sum(lost_income_ghati) , by(actyear T00_ActivityTypeName)
 
-tabdisp T00_ActivityTypeName if actyear == 1401, cellvar(t_profit_ebrazi_by_activity ///
-	t_tax_ebrazi_by_activity ///
-	t_tax_ghati_by_activity ///
-	etr_ebrazi_by_activity ///
-	etr_ghati_by_activity)
-	
-tabdisp T00_ActivityTypeName if actyear == 1401, cellvar(sum_lost_income_ebrazi_by_act ///
-	sum_lost_income_ghati_by_act)
-	
-	
+// tabdisp T00_ActivityTypeName if actyear == 1401, cellvar(t_profit_ebrazi_by_activity ///
+// 	t_tax_ebrazi_by_activity ///
+// 	t_tax_ghati_by_activity ///
+// 	etr_ebrazi_by_activity ///
+// 	etr_ghati_by_activity)
+//	
+// tabdisp T00_ActivityTypeName if actyear == 1401, cellvar(sum_lost_income_ebrazi_by_act ///
+// 	sum_lost_income_ghati_by_act)
+//	
+preserve
+	keep actyear T00_ActivityTypeName T00_ActivityType ///
+		t_profit_ebrazi_by_activity ///
+		t_tax_ebrazi_by_activity ///
+		t_tax_ghati_by_activity ///
+		etr_ebrazi_by_activity ///
+		etr_ghati_by_activity ///
+		sum_lost_income_ebrazi_by_act ///
+		sum_lost_income_ghati_by_act
+
+	duplicates drop
+	export excel "Corp by ActivityType.xlsx", firstrow(varl) replace
+restore
+	 
 // ##########################################################################################
 // ################################## ETR stats --- Time Series  ############################
 
