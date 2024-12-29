@@ -72,6 +72,10 @@ drop if tax_ghati < 0
 replace is_not_audited = 1 if missing(tax_ghati)
 // drop if is_not_audited == 1
 
+
+// ### ????
+replace tax_ghati = maliat_tashkhisi if missing(tax_ghati)
+
 tab actyear
 
 // ############################################## Calculate ETR  ###########################################
@@ -90,11 +94,18 @@ gen lost_income_ebrazi = (profit_ebrazi * 0.25 - tax_ebrazi)  / 10 / 1000 / 1000
 gen lost_income_ghati  = (profit_ebrazi * 0.25 - tax_ghati)  / 10 / 1000 / 1000 / 1000 // Billion Toman
 
 
+gen lost_income_ebrazi2 = 0
+	replace lost_income_ebrazi2 = lost_income_ebrazi2 + T26_R04 * 0.25 if !missing(T26_R04)
+	replace lost_income_ebrazi2 = lost_income_ebrazi2 + T26_R16 if !missing(T26_R16)
+	replace lost_income_ebrazi2 = lost_income_ebrazi2 / 10 / 1000 / 1000 / 1000 // Billion Toman
+	replace lost_income_ebrazi2 = . if missing(T26_R04) & missing(T26_R16)
+
+
 // ####### Deciles
 
 egen deciles_100 = xtile(profit_ebrazi) , by(actyear) nq(100)
-egen deciles_20  = xtile(profit_ebrazi) , by(actyear) nq(20)
-egen deciles_10  = xtile(profit_ebrazi) , by(actyear) nq(10)
+// egen deciles_20  = xtile(profit_ebrazi) , by(actyear) nq(20)
+// egen deciles_10  = xtile(profit_ebrazi) , by(actyear) nq(10)
 
 egen avg_profit_percentile = mean(profit_ebrazi) if is_not_audited == 0, by(actyear deciles_100)
 // line avg_profit_percentile deciles_100 if actyear == 1401 & deciles_100 > 90
@@ -102,7 +113,7 @@ egen avg_profit_percentile = mean(profit_ebrazi) if is_not_audited == 0, by(acty
 
 // ######################################## ETR in specific year (CDF) #################################
 
-local year 1400
+local year 1401
 graph drop _all
 
 preserve
@@ -230,7 +241,7 @@ gen etr_ebrazi_by_activity = t_tax_ebrazi_by_activity / t_profit_ebrazi_by_activ
 gen etr_ghati_by_activity  = t_tax_ghati_by_activity  / t_profit_ebrazi_by_activity
 
 
-egen sum_lost_income_ebrazi_by_act = sum(lost_income_ebrazi), by(actyear T00_ActivityTypeName)
+egen sum_lost_income_ebrazi_by_act = sum(lost_income_ebrazi2), by(actyear T00_ActivityTypeName)
 egen sum_lost_income_ghati_by_act  = sum(lost_income_ghati) , by(actyear T00_ActivityTypeName)
 
 // tabdisp T00_ActivityTypeName if actyear == 1401, cellvar(t_profit_ebrazi_by_activity ///
@@ -269,14 +280,14 @@ egen sum_tax_ebrazi_yearly 	  = sum(tax_ebrazi)   , by(actyear)
 egen sum_profit_ebrazi_yearly = sum(profit_ebrazi), by(actyear)
 gen etr_ebrazi_agr_yearly = sum_tax_ebrazi_yearly / sum_profit_ebrazi_yearly
 
-egen sum_lost_income_ebrazi = sum(lost_income_ebrazi), by(actyear)
+egen sum_lost_income_ebrazi = sum(lost_income_ebrazi2), by(actyear)
 
 
 
 local percent 0.01 
 display "##################  corporate with etr_ebrazi < `percent' ########"
 
-egen lp_sum_lost_income_ebrazi = sum( lost_income_ebrazi * (etr_ebrazi < `percent')), by(actyear)
+egen lp_sum_lost_income_ebrazi = sum( lost_income_ebrazi2 * (etr_ebrazi < `percent')), by(actyear)
 
 gen lp_is_etr_ebrazi = etr_ebrazi
 replace lp_is_etr_ebrazi = . if missing(etr_ebrazi)
@@ -346,6 +357,10 @@ preserve
 	bysort actyear (share_of_t_profit): gen topCorp = (_N - _n < `topCorp')
 	keep if topCorp == 1
 	
+	
+	// ### Important choice!
+	replace tax_ghati = maliat_tashkhisi if missing(tax_ghati)
+	
 	drop if tax_ghati < 0
 	drop if missing(share_of_t_profit)
 	drop if missing(tax_ghati)
@@ -358,7 +373,7 @@ preserve
 	egen sum_profit_ebrazi_yearly_topCorp = sum(profit_ebrazi), by(actyear)
 	gen etr_ebrazi_agr_yearly_topCorp     = sum_tax_ebrazi_yearly_topCorp / sum_profit_ebrazi_yearly_topCorp
 	
-	egen sum_lost_income_ebrazi_topCorp = sum(lost_income_ebrazi), by(actyear)
+	egen sum_lost_income_ebrazi_topCorp = sum(lost_income_ebrazi2), by(actyear)
 
 	// ### Ghati
 	egen sum_tax_ghati_yearly_topCorp = sum(tax_ghati)   , by(actyear)
