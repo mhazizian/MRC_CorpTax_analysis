@@ -318,3 +318,5 @@ $RECYCLE.BIN/
 
 Temp/
 Help/
+*.png
+*.xlsx
