@@ -7,6 +7,7 @@ graph drop _all
 // ssc inst _gwtmean, replace
 // ssc install niceloglabels 
 // ssc install astile
+// ssc install dataex
 // net install cleanplots, from("https://tdmize.github.io/data/cleanplots") replace
 
 set scheme cleanplots, perm
@@ -14,8 +15,8 @@ set scheme cleanplots, perm
 
 
 // local dir "D:\Data_Output\Hoghooghi"
-local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-// local dir "~\Documents\Majlis RC\data\tax_return\sharif"
+// local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+local dir "~\Documents\Majlis RC\data\tax_return\sharif"
 
 
 use "`dir'\Mohasebe_Maliat.dta", clear
@@ -31,6 +32,8 @@ drop if missing(actyear)
 // merge 1:1 id actyear using "`dir'\Sanim.dta"
 // rename maliyat_ghati tax_ghati
 // rename maliyat_tashkhis tax_tashkhisi
+// egen trace_id = concat(actyear id), punct(_)
+
 
 
 // @@@ MRC Version
@@ -124,17 +127,26 @@ frame create Moafiat_frame
 frame change Moafiat_frame
 
 // local dir "D:\Data_Output\Hoghooghi"
-local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+// local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 // local dir "~\Documents\Majlis RC\data\tax_return\sharif"
 
 
 use "`dir'\Moafiat.dta", clear
 
 drop if missing(actyear)
+local maliat_maghtoo_code 35
+
+// @@@ Sharif Version.
+// rename benefit Exempted_Profit
+// rename new_code exemption_id
+// local maliat_maghtoo_code 37
+// egen trace_id = concat(actyear id), punct(_)
+
 
 // maliat maghtoo:
-egen agr_maghtou = sum(Exempted_Profit * (exemption_id == 35)), by(trace_id)
-drop if exemption_id == 35
+
+egen agr_maghtou = sum(Exempted_Profit * (exemption_id == `maliat_maghtoo_code')), by(trace_id)
+drop if exemption_id == `maliat_maghtoo_code'
 
 egen agr_moafiat = sum(Exempted_Profit), by(trace_id)
 keep trace_id agr_moafiat agr_maghtou
@@ -149,16 +161,22 @@ frame drop Moafiat_frame
 drop Moafiat_frame
 
 
-// Bakhshoodegi:
+// ################ Bakhshoodegi ###########
 frame create Bakhshodegi_frame
 frame change Bakhshodegi_frame
 
 // local dir "D:\Data_Output\Hoghooghi"
-local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+// local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 // local dir "~\Documents\Majlis RC\data\tax_return\sharif"
 
 
 use "`dir'\Bakhshhodegi.dta", clear
+
+// @@@ Sharif Version.
+// rename bakhshoodegiqty Rebate_Amount
+// egen trace_id = concat(actyear id), punct(_)
+
+
 
 egen agr_bakhshoudegi = sum(Rebate_Amount), by(trace_id)
 keep trace_id agr_bakhshoudegi
@@ -278,9 +296,16 @@ egen avg_etr_ghati_percentile  = mean(etr_ghati_s), by(actyear percentile_g)
 egen avg_etr_ebrazi_percentile = mean(etr_ebrazi) if etr_ebrazi < 20, by(actyear percentile)
 
 
+//
+//
+//
+//
+//
+//
+//
 // ############################### Yearly Charts #########################
 frame change default
-local year 1400
+local year 1397
 graph drop _all
 
 frame copy default graph_frame, replace
