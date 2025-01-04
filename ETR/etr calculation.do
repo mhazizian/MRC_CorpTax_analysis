@@ -13,10 +13,11 @@ graph drop _all
 set scheme cleanplots, perm
 // set scheme s2color, perm
 
+local is_sharif_version 0
 
+// local dir "~\Documents\Majlis RC\data\tax_return\sharif"
 // local dir "D:\Data_Output\Hoghooghi"
-// local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-local dir "~\Documents\Majlis RC\data\tax_return\sharif"
+local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 
 
 use "`dir'\Mohasebe_Maliat.dta", clear
@@ -24,22 +25,27 @@ drop if missing(actyear)
 
 
 // @@@ Sharif Version.
-// gsort -T26_R01 
-// egen flag = tag(id actyear)
-// duplicates drop id actyear flag, force
-// drop if flag == 0
-// drop flag
-// merge 1:1 id actyear using "`dir'\Sanim.dta"
-// rename maliyat_ghati tax_ghati
-// rename maliyat_tashkhis tax_tashkhisi
-// egen trace_id = concat(actyear id), punct(_)
+if `is_sharif_version' == 1 {
+	gsort -T26_R01 
+	egen flag = tag(id actyear)
+	duplicates drop id actyear flag, force
+	drop if flag == 0
+	drop flag
+	merge 1:1 id actyear using "`dir'\Sanim.dta"
+	rename maliyat_ghati tax_ghati
+	rename maliyat_tashkhis tax_tashkhisi
+	egen trace_id = concat(actyear id), punct(_)    
+}
+
 
 
 
 // @@@ MRC Version
-merge 1:1 trace_id actyear using "`dir'\Legal_Person_Information.dta"
-rename maliat_ghatee tax_ghati
-rename maliat_tashkhisi tax_tashkhisi
+if `is_sharif_version' == 0 {
+	merge 1:1 trace_id actyear using "`dir'\Legal_Person_Information.dta"
+	rename maliat_ghatee tax_ghati
+	rename maliat_tashkhisi tax_tashkhisi
+}
 
 
 drop _merge
@@ -137,10 +143,12 @@ drop if missing(actyear)
 local maliat_maghtoo_code 35
 
 // @@@ Sharif Version.
-// rename benefit Exempted_Profit
-// rename new_code exemption_id
-// local maliat_maghtoo_code 37
-// egen trace_id = concat(actyear id), punct(_)
+if `is_sharif_version' == 1 {
+	rename benefit Exempted_Profit
+	rename new_code exemption_id
+	local maliat_maghtoo_code 37
+	egen trace_id = concat(actyear id), punct(_)
+}
 
 
 // maliat maghtoo:
@@ -173,8 +181,10 @@ frame change Bakhshodegi_frame
 use "`dir'\Bakhshhodegi.dta", clear
 
 // @@@ Sharif Version.
-// rename bakhshoodegiqty Rebate_Amount
-// egen trace_id = concat(actyear id), punct(_)
+if `is_sharif_version' == 1 {
+	rename bakhshoodegiqty Rebate_Amount
+	egen trace_id = concat(actyear id), punct(_)
+}
 
 
 
@@ -305,7 +315,7 @@ egen avg_etr_ebrazi_percentile = mean(etr_ebrazi) if etr_ebrazi < 20, by(actyear
 //
 // ############################### Yearly Charts #########################
 frame change default
-local year 1397
+local year 1400
 graph drop _all
 
 frame copy default graph_frame, replace
@@ -654,8 +664,6 @@ frame change default
 
 
 egen sum_lost_income_percentile = sum(lost_income_ebrazi2), by(actyear percentile)
-// sort percentile
-// line sum_lost_income_percentile percentile if actyear == 1400
 
 
 // gen tax_exp_to_profit_eb = avg_lost_income_percentile_eb / avg_profit_percentile
