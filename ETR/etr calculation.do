@@ -66,6 +66,8 @@ replace is_not_audited = 1 if (tax_ghati == 0) & (tax_tashkhisi > 0) & (tax_ebra
 // ###### Apply DadRessi Effect! #########
 
 gen dadressi_effect = tax_ghati / tax_tashkhisi
+
+// TODO: check this #outlier fix
 replace dadressi_effect = 1 if dadressi_effect > 1 & !missing(dadressi_effect)
 
 // egen avg_dadressi_effect = mean(dadressi_effect), by(actyear)
@@ -188,6 +190,7 @@ replace profit_ghati_cal = profit_ghati_cal + T26_004 if !missing(T26_004) 			//
 // replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// Moafiat
 replace profit_ghati_cal = profit_ghati_cal - T26_R02 if !missing(T26_R02) 			// going for Sood Vije
 replace profit_ghati_cal = profit_ghati_cal - T26_R03 if !missing(T26_R03) 			// going for Sood Vije
+replace profit_ghati_cal = profit_ghati_cal - T26_R08 if !missing(T26_R08) 			// Zian Gheir Moaf
 
 replace profit_ghati_cal = . if missing(tax_ghati)
 replace profit_ghati_cal = 0 if profit_ghati_cal < 0
@@ -219,7 +222,6 @@ gen lost_income_ghati  = (profit_ebrazi * 0.25 - tax_ghati)
 // 	replace lost_income_ghati = (profit_ebrazi * 0.25 - tax_tashkhisi)  if missing(tax_ghati)
 	replace lost_income_ghati = 0 if lost_income_ghati < 0
 	
-	
 gen lost_income_ebrazi2 = 0
 	replace lost_income_ebrazi2 = lost_income_ebrazi2 + agr_moafiat * 0.25 if !missing(agr_moafiat)
 	replace lost_income_ebrazi2 = lost_income_ebrazi2 + agr_bakhshoudegi if !missing(agr_bakhshoudegi)
@@ -227,6 +229,8 @@ gen lost_income_ebrazi2 = 0
 	replace lost_income_ebrazi2 = . if missing(agr_moafiat) & missing(agr_bakhshoudegi)
 
 	
+// TODO: check this #outlier fix.
+replace etr_ghati_s = 10 if etr_ghati_s > 10 & !missing(etr_ghati_s)
 
 // ################################ Duplicates Drop ####################
 
