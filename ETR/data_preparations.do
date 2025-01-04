@@ -3,46 +3,28 @@ frame reset
 graph set window fontface "B Nazanin"
 graph drop _all
 
-// ssc install egenmore
-// ssc inst _gwtmean, replace
-// ssc install niceloglabels 
-// ssc install astile
-// ssc install dataex
-// net install cleanplots, from("https://tdmize.github.io/data/cleanplots") replace
 
-set scheme cleanplots, perm
-// set scheme s2color, perm
-
-local is_sharif_version 0
-
-// local dir "~\Documents\Majlis RC\data\tax_return\sharif"
-// local dir "D:\Data_Output\Hoghooghi"
-local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-
-
-use "`dir'\Mohasebe_Maliat.dta", clear
+use "$dir\Mohasebe_Maliat.dta", clear
 drop if missing(actyear)
 
 
 // @@@ Sharif Version.
-if `is_sharif_version' == 1 {
+if $is_sharif_version == 1 {
 	gsort -T26_R01 
 	egen flag = tag(id actyear)
 	duplicates drop id actyear flag, force
 	drop if flag == 0
 	drop flag
-	merge 1:1 id actyear using "`dir'\Sanim.dta"
+	merge 1:1 id actyear using "$dir\Sanim.dta"
 	rename maliyat_ghati tax_ghati
 	rename maliyat_tashkhis tax_tashkhisi
 	egen trace_id = concat(actyear id), punct(_)    
 }
 
 
-
-
 // @@@ MRC Version
-if `is_sharif_version' == 0 {
-	merge 1:1 trace_id actyear using "`dir'\Legal_Person_Information.dta"
+if $is_sharif_version == 0 {
+	merge 1:1 trace_id actyear using "$dir\Legal_Person_Information.dta"
 	rename maliat_ghatee tax_ghati
 	rename maliat_tashkhisi tax_tashkhisi
 }
@@ -137,13 +119,13 @@ frame change Moafiat_frame
 // local dir "~\Documents\Majlis RC\data\tax_return\sharif"
 
 
-use "`dir'\Moafiat.dta", clear
+use "$dir\Moafiat.dta", clear
 
 drop if missing(actyear)
 local maliat_maghtoo_code 35
 
 // @@@ Sharif Version.
-if `is_sharif_version' == 1 {
+if $is_sharif_version == 1 {
 	rename benefit Exempted_Profit
 	rename new_code exemption_id
 	local maliat_maghtoo_code 37
@@ -178,10 +160,10 @@ frame change Bakhshodegi_frame
 // local dir "~\Documents\Majlis RC\data\tax_return\sharif"
 
 
-use "`dir'\Bakhshhodegi.dta", clear
+use "$dir\Bakhshhodegi.dta", clear
 
 // @@@ Sharif Version.
-if `is_sharif_version' == 1 {
+if $is_sharif_version == 1 {
 	rename bakhshoodegiqty Rebate_Amount
 	egen trace_id = concat(actyear id), punct(_)
 }

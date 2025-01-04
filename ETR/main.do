@@ -3,49 +3,61 @@ frame reset
 graph set window fontface "B Nazanin"
 graph drop _all
 
+// ssc install egenmore
+// ssc inst _gwtmean, replace
+// ssc install niceloglabels 
+// ssc install astile
+// ssc install dataex
+// net install cleanplots, from("https://tdmize.github.io/data/cleanplots") replace
+// set scheme s2color, perm
+set scheme cleanplots, perm
+
+
+
+global is_sharif_version 0
+
+global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+// global dir "~\Documents\Majlis RC\data\tax_return\sharif"
+// global dir "D:\Data_Output\Hoghooghi"
+
 
 do "ETR/data_preparations.do"
 
 // ####### Yearly Charts ########
 
+global year 1400
 do "ETR/graph_drawer.do"
 
-
-//
-// ################################## ########### ####################################
-// ################################## Lost Income ####################################
+// ######### Lost Income ############
 
 
 egen sum_lost_income_percentile = sum(lost_income_ebrazi2), by(actyear percentile)
 
-
 // gen tax_exp_to_profit_eb = avg_lost_income_percentile_eb / avg_profit_percentile
-egen tax_exp_to_profit_eb = mean(lost_income_ebrazi2 / profit_ebrazi), by(actyear percentile)
+// egen tax_exp_to_profit_eb = mean(lost_income_ebrazi2 / profit_ebrazi), by(actyear percentile)
 
-
-
-local year 1401
+local year 1400
 graph drop _all
 
 preserve
 	keep if actyear == `year'
 	
-		
+	
 	niceloglabels sum_lost_income_percentile if actyear == `year', local(yla) style(1) powers
 	line sum_lost_income_percentile percentile if actyear == `year', ///
+		sort ///
 		yscale(log) yla(`yla', ang(h)) ///
 		ytitle(درآمد از دست رفته دولت ابرازی) xtitle(صدک شرکت) ///
 		title(درآمد از دست رفته دولت در صدک -‍ `year'‍‍) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
 	graph export decile_lost_income_eb_`year'.png, as(png) replace
 	
-	
-	line tax_exp_to_profit_eb percentile if actyear == `year' & percentile > 10, ///
-		ytitle(نسبت مخارج مالیاتی به سود شرکت) xtitle(صدک شرکت) ///
-		title(متوسط نسبت مخارج مالیاتی به سود شرکت در هر صدک -‍ `year'‍‍) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export decile_lost_income_to_profit_eb_`year'.png, as(png) replace
-	
+// 	line tax_exp_to_profit_eb percentile if actyear == `year' & percentile > 10, ///
+// 		sort ///
+// 		ytitle(نسبت مخارج مالیاتی به سود شرکت) xtitle(صدک شرکت) ///
+// 		title(متوسط نسبت مخارج مالیاتی به سود شرکت در هر صدک -‍ `year'‍‍) ///
+// 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+// 	graph export decile_lost_income_to_profit_eb_`year'.png, as(png) replace
 	
 	gsort -lost_income_ebrazi2
 	gen idx = _n
