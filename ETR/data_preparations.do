@@ -287,3 +287,8 @@ egen low_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.05)  , by(actyear percent
 egen avg_etr_ghati_percentile  = mean(etr_ghati_s), by(actyear percentile_g)
 egen avg_etr_ebrazi_percentile = mean(etr_ebrazi) if etr_ebrazi < 20, by(actyear percentile)
 
+// Lost Income:
+egen sum_lost_income_percentile = sum(lost_income_ebrazi2), by(actyear percentile)
+// gen tax_exp_to_profit_eb = avg_lost_income_percentile_eb / avg_profit_percentile
+// egen tax_exp_to_profit_eb = mean(lost_income_ebrazi2 / profit_ebrazi), by(actyear percentile)
+

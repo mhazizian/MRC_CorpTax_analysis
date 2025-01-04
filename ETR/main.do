@@ -13,12 +13,12 @@ graph drop _all
 set scheme cleanplots, perm
 
 
-
 global is_sharif_version 0
-
 global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 // global dir "~\Documents\Majlis RC\data\tax_return\sharif"
 // global dir "D:\Data_Output\Hoghooghi"
+
+
 
 
 do "ETR/data_preparations.do"
@@ -28,49 +28,10 @@ do "ETR/data_preparations.do"
 global year 1400
 do "ETR/graph_drawer.do"
 
-// ######### Lost Income ############
+// ####### Moafiat & Bakhshoodegi ########
 
+do "ETR/moafiat-bakhshoodegi.do"
 
-egen sum_lost_income_percentile = sum(lost_income_ebrazi2), by(actyear percentile)
-
-// gen tax_exp_to_profit_eb = avg_lost_income_percentile_eb / avg_profit_percentile
-// egen tax_exp_to_profit_eb = mean(lost_income_ebrazi2 / profit_ebrazi), by(actyear percentile)
-
-local year 1400
-graph drop _all
-
-preserve
-	keep if actyear == `year'
-	
-	
-	niceloglabels sum_lost_income_percentile if actyear == `year', local(yla) style(1) powers
-	line sum_lost_income_percentile percentile if actyear == `year', ///
-		sort ///
-		yscale(log) yla(`yla', ang(h)) ///
-		ytitle(درآمد از دست رفته دولت ابرازی) xtitle(صدک شرکت) ///
-		title(درآمد از دست رفته دولت در صدک -‍ `year'‍‍) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export decile_lost_income_eb_`year'.png, as(png) replace
-	
-// 	line tax_exp_to_profit_eb percentile if actyear == `year' & percentile > 10, ///
-// 		sort ///
-// 		ytitle(نسبت مخارج مالیاتی به سود شرکت) xtitle(صدک شرکت) ///
-// 		title(متوسط نسبت مخارج مالیاتی به سود شرکت در هر صدک -‍ `year'‍‍) ///
-// 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-// 	graph export decile_lost_income_to_profit_eb_`year'.png, as(png) replace
-	
-	gsort -lost_income_ebrazi2
-	gen idx = _n
-	cumul idx [w=int(lost_income_ebrazi2)], gen(lost_income_cumul)
-	gsort -lost_income_cumul
-	line lost_income_cumul idx if idx < 500, name(LI0_`year') ///
-		title("سال `year'") ytitle(سهم از درآمد از دست رفته دولت) xtitle(تعداد شرکت) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-
-	graph export LI0_`year'.png, as(png) replace
-restore
-
-// ##########################################################################################
 // ################################## ETR stats --- Time Series  ############################
 
 

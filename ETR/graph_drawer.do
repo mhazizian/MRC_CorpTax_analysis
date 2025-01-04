@@ -84,6 +84,25 @@ frame change graph_frame
 	graph export C04_$year.png, as(png) replace
 	
 	
+	niceloglabels sum_lost_income_percentile, local(yla) style(1) powers
+	line sum_lost_income_percentile percentile, ///
+		sort ///
+		yscale(log) yla(`yla', ang(h)) ///
+		ytitle(درآمد از دست رفته دولت ابرازی) xtitle(صدک شرکت) ///
+		title(درآمد از دست رفته دولت در صدک -‍ $year‍‍) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export LI1_$year.png, as(png) replace
+	
+	
+	gsort -lost_income_ebrazi2
+	gen idx = _n
+	cumul idx [w=int(lost_income_ebrazi2)], gen(lost_income_cumul)
+	gsort -lost_income_cumul
+	line lost_income_cumul idx if idx < 500, name(LI0_$year) ///
+		title(سال $year) ytitle(سهم از درآمد از دست رفته دولت) xtitle(تعداد شرکت) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export LI0_$year.png, as(png) replace
+	
 // ##############	
 frame change graph_frame_e
 // graph drop _all
