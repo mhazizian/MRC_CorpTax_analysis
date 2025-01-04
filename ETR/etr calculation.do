@@ -230,7 +230,10 @@ gen lost_income_ebrazi2 = 0
 
 	
 // TODO: check this #outlier fix.
-replace etr_ghati_s = 10 if etr_ghati_s > 10 & !missing(etr_ghati_s)
+drop if etr_ghati_s > 10 & !missing(etr_ghati_s)
+drop if etr_ebrazi  > 10 & !missing(etr_ebrazi)
+
+// replace etr_ghati_s = 10 if etr_ghati_s > 10 & !missing(etr_ghati_s)
 
 // ################################ Duplicates Drop ####################
 
@@ -258,7 +261,7 @@ bysort actyear (profit_ghati_cal): gen top500 = (_N - _n < 500)
 bysort actyear (profit_ghati_cal): gen top200 = (_N - _n < 200)
 replace profit_ghati_cal = . if profit_ghati_cal == -1	
 
-egen avg_profit_percentile = mean(profit_ebrazi)		, by(actyear percentile)
+egen avg_profit_percentile   = mean(profit_ebrazi)		, by(actyear percentile)
 egen avg_profit_g_percentile = mean(profit_ghati_cal)	, by(actyear percentile_g)
 
 
@@ -277,7 +280,7 @@ egen avg_etr_ebrazi_percentile = mean(etr_ebrazi) if etr_ebrazi < 20, by(actyear
 
 // ############################### Yearly Charts #########################
 frame change default
-local year 1401
+local year 1400
 graph drop _all
 
 frame copy default graph_frame, replace
