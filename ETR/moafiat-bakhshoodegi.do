@@ -14,6 +14,7 @@ if $is_sharif_version == 1 {
 	rename new_code exemption_id
 	local maliat_maghtoo_code 37
 	egen trace_id = concat(actyear id), punct(_)
+	rename activity exemption_description
 }
 
 // Maliat Maghtoo
@@ -41,7 +42,7 @@ foreach vp in percentile percentile_g {
 			corp_count
 
 		duplicates drop
-		gsort -agr_moafiat	
+		gsort -agr_li_moafiat	
 		export excel "Moafiat_`vp'100.xlsx", firstrow(varl) replace
 	restore
 }
@@ -61,7 +62,7 @@ foreach v_etr in etr_ebrazi etr_ghati_s {
 				corp_count
 
 			duplicates drop
-			gsort -agr_moafiat	
+			gsort -agr_li_moafiat	
 			export excel "Moafiat_`v_etr'_Le`etr'p.xlsx", firstrow(varl) replace
 		restore
 	}
@@ -72,8 +73,9 @@ foreach v_etr in etr_ebrazi etr_ghati_s {
 frame change default
 frame drop Moafiat_frame
 
-
-// ######### Bakhshoodegi ###########
+// ############################  ####################################
+// #####################                #############################
+// ####################   Bakhshoodegi   ############################
 
 frame create Bakhshodegi_frame
 frame change Bakhshodegi_frame
@@ -84,6 +86,8 @@ use "$dir\Bakhshhodegi.dta", clear
 if $is_sharif_version == 1 {
 	rename bakhshoodegiqty Rebate_Amount
 	egen trace_id = concat(actyear id), punct(_)
+	rename bakhshoodegi_code bakhshoodegi_id
+	rename activity bakhshoodegi_description
 }
 
 
@@ -110,11 +114,11 @@ foreach vp in percentile percentile_g {
 		keep actyear ///
 			bakhshoodegi_id ///
 			bakhshoodegi_description ///
-			agr_li_moafiat ///
+			agr_li_bakhshoodegi ///
 			corp_count
 
 		duplicates drop
-		gsort -agr_moafiat	
+		gsort -agr_li_bakhshoodegi	
 		export excel "Bakhshoodegi_`vp'100.xlsx", firstrow(varl) replace
 	restore
 }
@@ -129,11 +133,11 @@ foreach v_etr in etr_ebrazi etr_ghati_s {
 			keep actyear ///
 				bakhshoodegi_id ///
 				bakhshoodegi_description ///
-				agr_li_moafiat ///
+				agr_li_bakhshoodegi ///
 				corp_count
 
 			duplicates drop
-			gsort -agr_moafiat	
+			gsort -agr_li_bakhshoodegi	
 			export excel "Bakhshoodegi_`v_etr'_Le`etr'p.xlsx", firstrow(varl) replace
 		restore
 	}

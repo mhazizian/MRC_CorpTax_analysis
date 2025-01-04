@@ -13,9 +13,9 @@ graph drop _all
 set scheme cleanplots, perm
 
 
-global is_sharif_version 0
-global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-// global dir "~\Documents\Majlis RC\data\tax_return\sharif"
+global is_sharif_version 1
+// global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+global dir "~\Documents\Majlis RC\data\tax_return\sharif"
 // global dir "D:\Data_Output\Hoghooghi"
 
 
@@ -206,6 +206,8 @@ egen sum_lost_income_ghati_by_act  = sum(lost_income_ghati) , by(actyear T00_Act
 // 	sum_lost_income_ghati_by_act)
 //	
 
+
+// TODO: top corp Sector analyis
 preserve
 	keep actyear T00_ActivityTypeName count_by_activity ///
 		t_profit_ebrazi_by_activity ///
