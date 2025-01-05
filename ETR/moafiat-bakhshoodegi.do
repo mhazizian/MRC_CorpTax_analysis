@@ -43,7 +43,7 @@ foreach vp in percentile percentile_g {
 
 		duplicates drop
 		gsort -agr_li_moafiat	
-		export excel "Moafiat_`vp'100.xlsx", firstrow(varl) replace
+		export excel "Moafiat_`vp'100_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
 	restore
 }
 
@@ -63,7 +63,7 @@ foreach v_etr in etr_ebrazi etr_ghati_s {
 
 			duplicates drop
 			gsort -agr_li_moafiat	
-			export excel "Moafiat_`v_etr'_Le`etr'p.xlsx", firstrow(varl) replace
+			export excel "Moafiat_`v_etr'_Le`etr'p_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
 		restore
 	}
 }
@@ -119,7 +119,7 @@ foreach vp in percentile percentile_g {
 
 		duplicates drop
 		gsort -agr_li_bakhshoodegi	
-		export excel "Bakhshoodegi_`vp'100.xlsx", firstrow(varl) replace
+		export excel "Bakhshoodegi_`vp'100_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
 	restore
 }
 
@@ -138,7 +138,7 @@ foreach v_etr in etr_ebrazi etr_ghati_s {
 
 			duplicates drop
 			gsort -agr_li_bakhshoodegi	
-			export excel "Bakhshoodegi_`v_etr'_Le`etr'p.xlsx", firstrow(varl) replace
+			export excel "Bakhshoodegi_`v_etr'_Le`etr'p_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
 		restore
 	}
 }

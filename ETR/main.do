@@ -13,9 +13,9 @@ graph drop _all
 set scheme cleanplots, perm
 
 
-global is_sharif_version 1
-// global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-global dir "~\Documents\Majlis RC\data\tax_return\sharif"
+global is_sharif_version 0
+global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+// global dir "~\Documents\Majlis RC\data\tax_return\sharif"
 // global dir "D:\Data_Output\Hoghooghi"
 
 
@@ -32,82 +32,121 @@ do "ETR/graph_drawer.do"
 
 do "ETR/moafiat-bakhshoodegi.do"
 
-// ################################## ETR stats --- Time Series  ############################
+// ################################## Time Series  ############################
 
 
 egen total_profit_ebrazi = sum(profit_ebrazi), by(actyear)
-gen  share_of_t_profit   = profit_ebrazi / total_profit_ebrazi
-gsort -share_of_t_profit
+egen total_profit_ghati = sum(profit_ghati_cal), by(actyear)
 
-egen sum_tax_ebrazi_yearly 	  = sum(tax_ebrazi)   , by(actyear)
-egen sum_profit_ebrazi_yearly = sum(profit_ebrazi), by(actyear)
-gen etr_ebrazi_agr_yearly = sum_tax_ebrazi_yearly / sum_profit_ebrazi_yearly
+egen sum_tax_ebrazi_yearly = sum(tax_ebrazi), by(actyear)
+egen sum_tax_ghati_yearly  = sum(tax_ghati)	, by(actyear)
+
+gen  share_of_t_profit_e   = profit_ebrazi / total_profit_ebrazi
+gen  share_of_t_profit_g   = profit_ghati_cal / total_profit_ghati
+
+gen etr_ebrazi_agr_yearly = sum_tax_ebrazi_yearly / total_profit_ebrazi
+gen etr_ghati_agr_yearly  = sum_tax_ghati_yearly / total_profit_ghati
 
 egen sum_lost_income_ebrazi = sum(lost_income_ebrazi2), by(actyear)
 
 
-
 local percent 0.01 
-display "##################  corporate with etr_ebrazi < `percent' ########"
+display "###########  corporate with etr_ebrazi < `percent' ########"
 
-egen lp_sum_lost_income_ebrazi = sum( lost_income_ebrazi2 * (etr_ebrazi < `percent')), by(actyear)
+egen lp_sum_lost_income_ebrazi	 = sum( lost_income_ebrazi2 * (etr_ebrazi < `percent')), by(actyear)
+egen lp_sum_lost_income_ebrazi_g = sum( lost_income_ebrazi2 * (etr_ghati_s < `percent')), by(actyear)
 
-gen lp_is_etr_ebrazi = etr_ebrazi
-replace lp_is_etr_ebrazi = . if missing(etr_ebrazi)
-replace lp_is_etr_ebrazi = . if etr_ebrazi >= `percent'
+egen zero_rate_percent_ebrazi_yearly   = mean(etr_ebrazi  <= `percent'), by(actyear)
+egen zero_rate_percent_ghati_yearly    = mean(etr_ghati_s <= `percent'), by(actyear)
 
-egen lp_percent_etr_ebrazi = mean(lp_is_etr_ebrazi), by(actyear)
-egen lp_percent_etr_ebrazi_w = wtmean(lp_is_etr_ebrazi), by(actyear) weight(profit_ebrazi)
+
+egen zero_rate_profit_share_ebrazi   = sum(profit_ebrazi * (etr_ebrazi  <= `percent')), by(actyear)
+	replace zero_rate_profit_share_ebrazi = zero_rate_profit_share_ebrazi / total_profit_ebrazi
+	
+egen zero_rate_profit_share_ghati   = sum(profit_ghati_cal * (etr_ghati_s  <= `percent')), by(actyear)
+	replace zero_rate_profit_share_ghati = zero_rate_profit_share_ghati / total_profit_ghati
 
 preserve
+	keep if percentile == 100 & percentile_g == 100
 	keep actyear ///
 		etr_ebrazi_agr_yearly ///
-		sum_lost_income_ebrazi ///
-		lp_sum_lost_income_ebrazi ///
-		lp_percent_etr_ebrazi ///
-		lp_percent_etr_ebrazi_w
+		etr_ghati_agr_yearly ///
+		sum_lost_income_ebrazi /*
+		
+		less than 1 percent rate:
+		
+		*/ lp_sum_lost_income_ebrazi ///
+		lp_sum_lost_income_ebrazi_g ///
+		zero_rate_percent_ebrazi_yearly ///
+		zero_rate_percent_ghati_yearly ///
+		zero_rate_profit_share_ebrazi /// 
+		zero_rate_profit_share_ghati /*
+		
+		percentile 100 stats:
+		
+		*/ zero_rate_percent_ebrazi ///
+		zero_rate_percent_ghati_s ///
+		avg_etr_ebrazi_percentile ///
+		avg_etr_ghati_percentile 
 	duplicates drop
-	export excel "Corp - ETR timeSeries - Ebrazi.xlsx", firstrow(varl) replace
+	export excel "ETR_timeSeries_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
 restore
 
 
-// ################# GHATI ##################
-preserve 
-	drop if missing(tax_ghati)
-	drop if is_not_audited
-	drop if tax_ghati < 0
-	
-	
-	egen sum_tax_ghati_yearly 	  = sum(tax_ghati)   , by(actyear)
-	gen etr_ghati_agr_yearly = sum_tax_ghati_yearly / sum_profit_ebrazi_yearly
 
-	egen sum_lost_income_ghati = sum(lost_income_ghati), by(actyear)
+// ################################# Sector Analisys ####################################
 
-	
-	local percent 0.01
-	display "##################  corporate with etr_ghati < `percent' ########"
-	
-	egen lp_sum_lost_income_ghati = sum( lost_income_ghati * (etr_ghati < `percent')), by(actyear)
-	
-	gen lp_is_etr_ghati = etr_ghati
-	replace lp_is_etr_ghati = . if missing(etr_ghati)
-	replace lp_is_etr_ghati = . if etr_ghati >= `percent'
-	
-	egen lp_percent_etr_ghati = mean(lp_is_etr_ghati), by(actyear)
-	egen lp_percent_etr_ghati_w = wtmean(lp_is_etr_ghati), by(actyear) weight(profit_ebrazi)
-	
+replace T00_ActivityTypeName = -1 if missing(T00_ActivityTypeName)
+
+egen t_profit_ebrazi_by_activity = sum(profit_ebrazi)	, by(actyear T00_ActivityTypeName)
+egen t_profit_ghati_by_activity = sum(profit_ghati_cal)	, by(actyear T00_ActivityTypeName)
+egen t_tax_ebrazi_by_activity = sum(tax_ebrazi)			, by(actyear T00_ActivityTypeName)
+egen t_tax_ghati_by_activity = sum(tax_ghati)			, by(actyear T00_ActivityTypeName)
+egen count_by_activity = count(id)						, by(actyear T00_ActivityTypeName)
+
+gen etr_ebrazi_by_activity = t_tax_ebrazi_by_activity / t_profit_ebrazi_by_activity
+gen etr_ghati_by_activity  = t_tax_ghati_by_activity  / t_profit_ghati_by_activity
+
+egen sum_lost_income_ebrazi_by_act = sum(lost_income_ebrazi2), by(actyear T00_ActivityTypeName)
+
+egen count_percentile100 = sum(percentile_g == 100)		, by(actyear T00_ActivityTypeName)
+egen t_profit_ghati_p100_by_activity = sum(profit_ghati_cal * (percentile_g == 100)) ///
+		, by(actyear T00_ActivityTypeName)
+
+
+// TODO: top corp Sector analyis
+preserve
+	keep if percentile_g == 100
 	keep actyear ///
-		etr_ghati_agr_yearly ///
-		sum_lost_income_ghati ///
-		lp_sum_lost_income_ghati ///
-		lp_percent_etr_ghati ///
-		lp_percent_etr_ghati_w
+		T00_ActivityTypeName ///
+		count_by_activity ///
+		t_profit_ebrazi_by_activity ///
+		t_profit_ghati_by_activity ///
+		t_tax_ebrazi_by_activity ///
+		t_tax_ghati_by_activity ///
+		etr_ebrazi_by_activity ///
+		etr_ghati_by_activity ///
+		sum_lost_income_ebrazi_by_act /*
+		
+		percentile 100:
+		
+		*/ count_percentile100 ///
+		t_profit_ghati_p100_by_activity
+
 	duplicates drop
-	export excel "Corp - ETR timeSeries - Ghati.xlsx", firstrow(varl) replace
-
-restore	
-
-
+	export excel "Corp by ActivityType.xlsx", firstrow(varl) replace
+restore
+	 
+	 
+//
+//
+//
+//
+//
+//
+//
+//
+// 
 // ################# TopCorp ##################
 
 local topCorp 20
@@ -179,46 +218,3 @@ preserve
 
 restore
 
-
-// ################################# Sector Analisys ####################################
-
-replace T00_ActivityTypeName = -1 if missing(T00_ActivityTypeName)
-
-egen t_profit_ebrazi_by_activity = sum(profit_ebrazi)	, by(actyear T00_ActivityTypeName)
-egen t_tax_ebrazi_by_activity = sum(tax_ebrazi)			, by(actyear T00_ActivityTypeName)
-egen t_tax_ghati_by_activity = sum(tax_ghati)			, by(actyear T00_ActivityTypeName)
-egen count_by_activity = count(profit_ebrazi)			, by(actyear T00_ActivityTypeName)
-
-gen etr_ebrazi_by_activity = t_tax_ebrazi_by_activity / t_profit_ebrazi_by_activity
-gen etr_ghati_by_activity  = t_tax_ghati_by_activity  / t_profit_ebrazi_by_activity
-
-
-egen sum_lost_income_ebrazi_by_act = sum(lost_income_ebrazi2), by(actyear T00_ActivityTypeName)
-egen sum_lost_income_ghati_by_act  = sum(lost_income_ghati) , by(actyear T00_ActivityTypeName)
-
-// tabdisp T00_ActivityTypeName if actyear == 1401, cellvar(t_profit_ebrazi_by_activity ///
-// 	t_tax_ebrazi_by_activity ///
-// 	t_tax_ghati_by_activity ///
-// 	etr_ebrazi_by_activity ///
-// 	etr_ghati_by_activity)
-//	
-// tabdisp T00_ActivityTypeName if actyear == 1401, cellvar(sum_lost_income_ebrazi_by_act ///
-// 	sum_lost_income_ghati_by_act)
-//	
-
-
-// TODO: top corp Sector analyis
-preserve
-	keep actyear T00_ActivityTypeName count_by_activity ///
-		t_profit_ebrazi_by_activity ///
-		t_tax_ebrazi_by_activity ///
-		t_tax_ghati_by_activity ///
-		etr_ebrazi_by_activity ///
-		etr_ghati_by_activity ///
-		sum_lost_income_ebrazi_by_act ///
-		sum_lost_income_ghati_by_act
-
-	duplicates drop
-	export excel "Corp by ActivityType.xlsx", firstrow(varl) replace
-restore
-	 
