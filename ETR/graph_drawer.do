@@ -1,5 +1,5 @@
 
-// frame change default
+frame change default
 graph drop _all
 
 
@@ -103,95 +103,9 @@ frame change graph_frame
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
 	graph export LI0_$year.png, as(png) replace
 	
-// ##############	
-frame change graph_frame_e
-// graph drop _all
-	
-	line avg_etr_ebrazi_percentile percentile, sort name(CG12_$year) ///
-		ytitle(متوسط نرخ مالیات ابرازی شرکت) xtitle(صدک شرکت) ///
-		title(متوسط نرخ موثر مالیاتی ابرازی در هر صدک -‍ $year‍‍) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(cranberry)
-	graph export CE12_$year.png, as(png) replace
-	
-	
-	
-	cumul etr_ebrazi, gen(etr_ebrazi_cumul)
-	line etr_ebrazi_cumul etr_ebrazi if etr_ebrazi < 0.251, sort name(CE0_$year) ylab(, grid) xlab(, grid) ///
-		ytitle(سهم از تعداد شرکت‌ها) xtitle(نرخ موثر مالیات ابرازی) ///
-		title(توزیع تجمعی نرخ مالیات موثر ابرازی -‍ $year) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(blue)
-	graph export CE00_$year.png, as(png) replace
-	
-	hist etr_ebrazi2, percent name(CE1_$year) bin(26) ylab(, grid) xlab(, grid) ///
-		ytitle(سهم از تعداد شرکت‌ها (درصد)) xtitle(نرخ موثر مالیات ابرازی) ///
-		title(توزیع نرخ مالیات موثر ابرازی -‍ $year‍‍) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CE01_$year.png, as(png) replace
-	
-	
-	cumul etr_ebrazi [w=int(profit_ebrazi)] , gen(etr_ebrazi_cumul_w)
-	line etr_ebrazi_cumul_w etr_ebrazi if etr_ebrazi < 0.251, sort name(CE2_$year) ///
-		ylab(, grid) xlab(, grid) ytitle(سهم از مجموع سود قبل از مالیات شرکت‌ها) ///
-		xtitle(نرخ موثر مالیات ابرازی) title(توزیع تجمعی وزن‌دار نرخ مالیات موثر ابرازی -‍ $year) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(blue)
-	graph export CE02_$year.png, as(png) replace	
-	
-	
-	hist etr_ebrazi2 [w=int(profit_ebrazi)], percent name(CE3_$year) bin(26) ///
-		ylab(, grid) xlab(, grid) ytitle(سهم از مجموع سود قبل از مالیات شرکت‌ها) ///
-		xtitle(نرخ موثر مالیات ابرازی) title(توزیع نرخ مالیات موثر ابرازی بر اساس سود شرکت -‍ $year) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CE03_$year.png, as(png) replace
-		
-	hist etr_ebrazi2 if percentile == 100, percent name(CE5_$year) bin(26) ///
-		title(توزیع نرخ مالیات موثر ابرازی صدک شرکت پرسود -‍ $year) ///
-		ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CE05_$year.png, as(png) replace
-	
-	hist etr_ebrazi2 if percentile <= 20 & etr_ebrazi < 0.251, percent bin(26) name(CE6_$year) ///
-		title(صدک ۱ تا ۲۰ - $year) ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CE06_$year.png, as(png) replace
-	
-	hist etr_ebrazi2 if percentile < 20 & percentile < 90 & etr_ebrazi < 0.251, percent name(CE7_$year) ///
-		bin(26) title(صدک ۲۰ تا ۹۰ - $year) ytitle(درصد) xtitle(نرخ موثر مالیات قطعی) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CE07_$year.png, as(png) replace
-	
-	line zero_rate_percent_ebrazi percentile if actyear == $year, sort name(CE8_$year) ///
-		ytitle(درصد شرکت با نرخ موثر کمتر از ۱ درصد) xtitle(صدک شرکت) ///
-		title(توزیع شرکت‌های با نرخ موثر ابرازی کمتر از ۱ درصد در صدک‌ها -‍ $year‍‍) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(blue)
-	graph export CE08_$year.png, as(png) replace
-	
-	hist etr_ebrazi2 if top1000 == 1, percent bin(26) ///
-		title(توزیع نرخ مالیات موثر ابرازی ۱۰۰۰ شرکت پرسود -‍ $year) ///
-		ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CE09_$year.png, as(png) replace
-	
-	hist etr_ebrazi2 if top500 == 1, percent bin(26) ///
-		title(توزیع نرخ مالیات موثر ابرازی ۵۰۰ شرکت پرسود -‍ $year) ///
-		ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CE10_$year.png, as(png) replace
-	
-	hist etr_ebrazi2 if top200 == 1, percent bin(26) ///
-		title(توزیع نرخ مالیات موثر ابرازی ۲۰۰ شرکت پرسود -‍ $year) ///
-		ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CE11_$year.png, as(png) replace
 	
 
-//
-//
-//
-//
-//
-//
-//
-//	
+
 // ##############
 frame change graph_frame_g
 graph drop _all
@@ -257,6 +171,11 @@ graph drop _all
 		xscale(titlegap(2.5)) yscale(titlegap(1.5) range(0 1)) yla(0 0.2 0.4 0.6 0.8 1)
 	graph export CG10_$year.png, as(png) replace	
 
+
+
+
+	
+	
 	
 	
 	
@@ -393,19 +312,120 @@ graph drop _all
 		title(توزیع نرخ مالیات موثر قطعی ۱۰۰۰ شرکت پرسود -‍ $year ) ///
 		ytitle(درصد) xtitle(نرخ موثر مالیات قطعی) color(cranberry) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CG09_$year.png, as(png) replace
+	graph export CG081_$year.png, as(png) replace
 	
 	hist etr_ghati2 if top500 == 1, percent bin(26) ///
 		title(توزیع نرخ مالیات موثر قطعی ۵۰۰ شرکت پرسود -‍ $year ) ///
 		ytitle(درصد) xtitle(نرخ موثر مالیات قطعی) color(cranberry) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CG10_$year.png, as(png) replace
+	graph export CG082_$year.png, as(png) replace
 	
 	hist etr_ghati_s2 if top200 == 1, percent bin(25) ///
 		title(توزیع نرخ مالیات موثر قطعی ۲۰۰ شرکت پرسود -‍ $year ) ///
 		ytitle(درصد) xtitle(نرخ موثر مالیات قطعی) color(cranberry) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-	graph export CG11_$year.png, as(png) replace
+	graph export CG083_$year.png, as(png) replace
+
+	
+	
+//
+//
+//
+//
+//
+//
+//	
+// ##############	
+
+
+frame change graph_frame_e
+// graph drop _all
+	
+	line avg_etr_ebrazi_percentile percentile, sort name(CG12_$year) ///
+		ytitle(متوسط نرخ مالیات ابرازی شرکت) xtitle(صدک شرکت) ///
+		title(متوسط نرخ موثر مالیاتی ابرازی در هر صدک -‍ $year‍‍) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(cranberry)
+	graph export CE12_$year.png, as(png) replace
+	
+	
+	
+	cumul etr_ebrazi, gen(etr_ebrazi_cumul)
+	line etr_ebrazi_cumul etr_ebrazi if etr_ebrazi < 0.251, sort name(CE0_$year) ylab(, grid) xlab(, grid) ///
+		ytitle(سهم از تعداد شرکت‌ها) xtitle(نرخ موثر مالیات ابرازی) ///
+		title(توزیع تجمعی نرخ مالیات موثر ابرازی -‍ $year) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(blue)
+	graph export CE00_$year.png, as(png) replace
+	
+	hist etr_ebrazi2, percent name(CE1_$year) bin(26) ylab(, grid) xlab(, grid) ///
+		ytitle(سهم از تعداد شرکت‌ها (درصد)) xtitle(نرخ موثر مالیات ابرازی) ///
+		title(توزیع نرخ مالیات موثر ابرازی -‍ $year‍‍) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export CE01_$year.png, as(png) replace
+	
+	
+	cumul etr_ebrazi [w=int(profit_ebrazi)] , gen(etr_ebrazi_cumul_w)
+	line etr_ebrazi_cumul_w etr_ebrazi if etr_ebrazi < 0.251, sort name(CE2_$year) ///
+		ylab(, grid) xlab(, grid) ytitle(سهم از مجموع سود قبل از مالیات شرکت‌ها) ///
+		xtitle(نرخ موثر مالیات ابرازی) title(توزیع تجمعی وزن‌دار نرخ مالیات موثر ابرازی -‍ $year) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(blue)
+	graph export CE02_$year.png, as(png) replace	
+	
+	
+	hist etr_ebrazi2 [w=int(profit_ebrazi)], percent name(CE3_$year) bin(26) ///
+		ylab(, grid) xlab(, grid) ytitle(سهم از مجموع سود قبل از مالیات شرکت‌ها) ///
+		xtitle(نرخ موثر مالیات ابرازی) title(توزیع نرخ مالیات موثر ابرازی بر اساس سود شرکت -‍ $year) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export CE03_$year.png, as(png) replace
+		
+	hist etr_ebrazi2 if percentile == 100, percent name(CE5_$year) bin(26) ///
+		title(توزیع نرخ مالیات موثر ابرازی صدک شرکت پرسود -‍ $year) ///
+		ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export CE05_$year.png, as(png) replace
+	
+	hist etr_ebrazi2 if percentile <= 20 & etr_ebrazi < 0.251, percent bin(26) name(CE6_$year) ///
+		title(صدک ۱ تا ۲۰ - $year) ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export CE06_$year.png, as(png) replace
+	
+	hist etr_ebrazi2 if percentile < 20 & percentile < 90 & etr_ebrazi < 0.251, percent name(CE7_$year) ///
+		bin(26) title(صدک ۲۰ تا ۹۰ - $year) ytitle(درصد) xtitle(نرخ موثر مالیات قطعی) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export CE07_$year.png, as(png) replace
+	
+	line zero_rate_percent_ebrazi percentile if actyear == $year, sort name(CE8_$year) ///
+		ytitle(درصد شرکت با نرخ موثر کمتر از ۱ درصد) xtitle(صدک شرکت) ///
+		title(توزیع شرکت‌های با نرخ موثر ابرازی کمتر از ۱ درصد در صدک‌ها -‍ $year‍‍) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(blue)
+	graph export CE08_$year.png, as(png) replace
+	
+	hist etr_ebrazi2 if top1000 == 1, percent bin(26) ///
+		title(توزیع نرخ مالیات موثر ابرازی ۱۰۰۰ شرکت پرسود -‍ $year) ///
+		ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export CE09_$year.png, as(png) replace
+	
+	hist etr_ebrazi2 if top500 == 1, percent bin(26) ///
+		title(توزیع نرخ مالیات موثر ابرازی ۵۰۰ شرکت پرسود -‍ $year) ///
+		ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export CE10_$year.png, as(png) replace
+	
+	hist etr_ebrazi2 if top200 == 1, percent bin(26) ///
+		title(توزیع نرخ مالیات موثر ابرازی ۲۰۰ شرکت پرسود -‍ $year) ///
+		ytitle(درصد) xtitle(نرخ موثر مالیات ابرازی) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export CE11_$year.png, as(png) replace
+	
+
+//
+//
+//
+//
+//
+//
+//
+//
 	
 frame change default
 

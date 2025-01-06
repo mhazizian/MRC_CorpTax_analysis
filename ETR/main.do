@@ -13,9 +13,9 @@ graph drop _all
 set scheme cleanplots, perm
 
 
-global is_sharif_version 1
-// global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-global dir "~\Documents\Majlis RC\data\tax_return\sharif"
+global is_sharif_version 0
+global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+// global dir "~\Documents\Majlis RC\data\tax_return\sharif"
 // global dir "D:\Data_Output\Hoghooghi"
 
 
@@ -24,10 +24,12 @@ global dir "~\Documents\Majlis RC\data\tax_return\sharif"
 do "ETR/data_preparations.do"
 
 save "corp_cleaned_data_isSharif$is_sharif_version.dta", replace
+// use "corp_cleaned_data_isSharif$is_sharif_version.dta", clear
+
 
 // ####### Yearly Charts ########
 
-global year 1401
+global year 1400
 do "ETR/graph_drawer.do"
 
 // ####### Moafiat & Bakhshoodegi ########
