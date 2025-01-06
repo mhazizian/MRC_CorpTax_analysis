@@ -289,7 +289,11 @@ egen zero_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.01) , by(actyear percent
 egen zero_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.01) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
 
+label variable zero_rate_percent_ghati_s "سهم شرکت‌های با نرخ موثر قطعی ۰ تا ۱ درصد از کل سود در سال و صدک"
+label variable zero_rate_percent_ebrazi "سهم شرکت‌های با نرخ موثر ابرازی ۰ تا ۱ درصد از کل سود در سال و صدک"
 
+
+	
 egen low_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.05)	, by(actyear percentile)
 egen low_rate_percent_ghati    = mean(etr_ghati <= 0.05)    , by(actyear percentile_g)
 egen low_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.05)  , by(actyear percentile_g)

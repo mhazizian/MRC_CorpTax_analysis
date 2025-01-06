@@ -409,6 +409,6 @@ graph drop _all
 	
 frame change default
 
-drop frame graph_frame
-drop frame graph_frame_e
-drop frame graph_frame_g
+frame drop graph_frame
+frame drop graph_frame_e
+frame drop graph_frame_g

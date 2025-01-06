@@ -29,7 +29,8 @@ frget profit_ebrazi		, from(default)
 frget profit_ghati_cal	, from(default)
 
 
-foreach vp in percentile percentile_g {
+// foreach vp in percentile percentile_g {
+foreach vp in percentile_g {
 	preserve
 		keep if `vp' == 100
 		egen agr_li_moafiat = sum(Exempted_Profit * 0.25), by(exemption_id actyear)
@@ -49,7 +50,8 @@ foreach vp in percentile percentile_g {
 
 
 foreach v_etr in etr_ebrazi etr_ghati_s {
-	foreach etr in 0.01 0.05 {
+// 	foreach etr in 0.01 0.05 {
+	foreach etr in 0.01 {
 		preserve
 			keep if `v_etr' <= `etr'
 			egen agr_li_moafiat = sum(Exempted_Profit * 0.25), by(exemption_id actyear)
@@ -105,7 +107,7 @@ frget profit_ebrazi		, from(default)
 frget profit_ghati_cal	, from(default)
 
 
-foreach vp in percentile percentile_g {
+foreach vp in percentile_g {
 	preserve
 		keep if `vp' == 100
 		egen agr_li_bakhshoodegi = sum(Rebate_Amount), by(bakhshoodegi_id actyear)
@@ -124,7 +126,7 @@ foreach vp in percentile percentile_g {
 }
 
 foreach v_etr in etr_ebrazi etr_ghati_s {
-	foreach etr in 0.01 0.05 {
+	foreach etr in 0.01 {
 		preserve
 			keep if `v_etr' <= `etr'
 			egen agr_li_bakhshoodegi = sum(Rebate_Amount), by(bakhshoodegi_id actyear)
