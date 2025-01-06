@@ -62,9 +62,12 @@ egen zero_rate_percent_ghati_yearly    = mean(etr_ghati_s <= `percent'), by(acty
 
 egen zero_rate_profit_share_ebrazi   = sum(profit_ebrazi * (etr_ebrazi  <= `percent')), by(actyear)
 	replace zero_rate_profit_share_ebrazi = zero_rate_profit_share_ebrazi / total_profit_ebrazi
+label variable zero_rate_profit_share_ghati "سهم شرکت‌های با نرخ موثر ابرازی ۰ تا ۱ درصد از کل سود در سال"
+
 	
 egen zero_rate_profit_share_ghati   = sum(profit_ghati_cal * (etr_ghati_s  <= `percent')), by(actyear)
 	replace zero_rate_profit_share_ghati = zero_rate_profit_share_ghati / total_profit_ghati
+label variable zero_rate_profit_share_ghati "سهم شرکت‌های با نرخ موثر قطعی ۰ تا ۱ درصد از کل سود در سال"
 
 preserve
 	keep if percentile == 100 & percentile_g == 100
