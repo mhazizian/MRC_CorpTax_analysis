@@ -274,18 +274,57 @@ replace profit_ghati_cal = . if profit_ghati_cal == -1
 egen avg_profit_percentile   = mean(profit_ebrazi)		, by(actyear percentile)
 egen avg_profit_g_percentile = mean(profit_ghati_cal)	, by(actyear percentile_g)
 
+egen sum_profit_percentile   = sum(profit_ebrazi), by(actyear percentile)
+egen sum_profit_g_percentile = sum(profit_ghati_cal), by(actyear percentile_g)
+
+egen sum_profit_g_prct_zero_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.01)) , by(actyear percentile_g)
+egen sum_profit_g_prct_low_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.05)) , by(actyear percentile_g)
+egen sum_profit_g_prct_middle_rate 	= sum(profit_ghati_cal * (etr_ghati_s <= 0.2)) , by(actyear percentile_g)
+egen sum_profit_g_prct_high_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.25)) , by(actyear percentile_g)
+
 
 egen zero_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.01)	, by(actyear percentile)
 egen zero_rate_percent_ghati    = mean(etr_ghati <= 0.01)   , by(actyear percentile_g)
 egen zero_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.01) , by(actyear percentile_g)
+egen zero_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.01) / sum_profit_g_percentile) ///
+	, by(actyear percentile_g)
+
 
 egen low_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.05)	, by(actyear percentile)
 egen low_rate_percent_ghati    = mean(etr_ghati <= 0.05)    , by(actyear percentile_g)
 egen low_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.05)  , by(actyear percentile_g)
+egen low_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.05) / sum_profit_g_percentile) ///
+	, by(actyear percentile_g)
+
+egen middle_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.2)	, by(actyear percentile)
+egen middle_rate_percent_ghati    = mean(etr_ghati <= 0.2)    , by(actyear percentile_g)
+egen middle_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.2)  , by(actyear percentile_g)
+egen middle_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.2) / sum_profit_g_percentile) ///
+	, by(actyear percentile_g)
+
+egen high_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.25)	, by(actyear percentile)
+egen high_rate_percent_ghati    = mean(etr_ghati <= 0.25)    , by(actyear percentile_g)
+egen high_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.25)  , by(actyear percentile_g)
+egen high_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.25) / sum_profit_g_percentile) ///
+	, by(actyear percentile_g)
 
 
 egen avg_etr_ghati_percentile  = mean(etr_ghati_s), by(actyear percentile_g)
 egen avg_etr_ebrazi_percentile = mean(etr_ebrazi) if etr_ebrazi < 20, by(actyear percentile)
+
+
+gen etr_tag = .
+replace etr_tag = 4 if etr_ghati_s <= 0.25
+replace etr_tag = 3 if etr_ghati_s <= 0.2
+replace etr_tag = 2 if etr_ghati_s <= 0.05
+replace etr_tag = 1 if etr_ghati_s <= 0.01
+
+label define etr_tag_label ///
+	1 "از ۰ تا ۱ درصد" ///
+	2 "از ۱ تا ۵ درصد" ///
+	3 "از ۵ تا ۲۰ درصد" ///
+	4 "از ۲۰ تا ۲۵ درصد"
+label values etr_tag etr_tag_label
 
 // Lost Income:
 egen sum_lost_income_percentile = sum(lost_income_ebrazi2), by(actyear percentile)

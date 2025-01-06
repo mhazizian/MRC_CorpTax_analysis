@@ -107,8 +107,6 @@ frame change graph_frame
 frame change graph_frame_e
 // graph drop _all
 	
-	tab actyear
-	
 	line avg_etr_ebrazi_percentile percentile, sort name(CG12_$year) ///
 		ytitle(متوسط نرخ مالیات ابرازی شرکت) xtitle(صدک شرکت) ///
 		title(متوسط نرخ موثر مالیاتی ابرازی در هر صدک -‍ $year‍‍) ///
@@ -186,13 +184,81 @@ frame change graph_frame_e
 	graph export CE11_$year.png, as(png) replace
 	
 
-	
+//
+//
+//
+//
+//
+//
+//
+//	
 // ##############
 frame change graph_frame_g
 graph drop _all
 
+	gen seg = .
+	replace seg = 1 if percentile_g == 100
+	replace seg = 2 if percentile_g <= 99
+	replace seg = 3 if percentile_g < 90
 	
-	tab actyear
+	label define seg_label ///
+		1 "صدک ۱۰۰ ام" ///
+		2 "صدک ۹۰ تا ۹۹" ///
+		3 "صدک ۱ تا ۹۰"
+	label values seg seg_label
+	
+	graph pie, ///
+		over(etr_tag) ///
+		by(seg, rows(1) title("توزیع نرخ موثر قطعی شرکت در صدک های مختلف") note("")) ///
+		subtitle(, alignment(middle)) ///
+		plabel(_all percent, format(%2.0f) color(white) gap(-12)) ///
+		line(lcolor(black) lwidth(0.2)) ///
+		graphregion(color(white)) ///
+		legend(rows(1) symxsize(*1.5) size(*1.2) ring(0)) 
+	graph export CG13_$year.png, as(png) replace
+	
+
+
+	sort percentile_g
+	niceloglabels sum_profit_g_prct_high_rate, local(yla) style(1) powers
+	twoway ///
+		(area  sum_profit_g_prct_zero_rate 	percentile_g ) || ///
+		(rarea sum_profit_g_prct_zero_rate 		sum_profit_g_prct_low_rate	 percentile_g) || ///
+		(rarea sum_profit_g_prct_low_rate 		sum_profit_g_prct_middle_rate	 percentile_g) || ///
+		(rarea sum_profit_g_prct_middle_rate 	sum_profit_g_prct_high_rate	 percentile_g) if percentile_g > 95, ///
+		legend(order(4 "از ۲۰ تا ۲۵ درصد" 3 "از ۵ تا ۲۰ درصد" 2 "از ۱ تا ۵ درصد" 1 "از ۰ تا ۱ درصد") pos(6) row(1)) ///
+		ylab(, grid) xlab(, grid) ///
+		ytitle(درصد از مجموع سود شرکت‌ها در هر صدک) xtitle(صدک شرکت) ///
+		title(توزیع نرخ موثر مالیات قطعی شرکت در هر صدک -‍ $year‍‍) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export CG12_$year.png, as(png) replace
+	
+	twoway ///
+		(area  zero_rate_percent_ghati_sw 	percentile_g ) || ///
+		(rarea zero_rate_percent_ghati_sw 		low_rate_percent_ghati_sw		 percentile_g) || ///
+		(rarea low_rate_percent_ghati_sw	 	middle_rate_percent_ghati_sw	 percentile_g) || ///
+		(rarea middle_rate_percent_ghati_sw 	high_rate_percent_ghati_sw		 percentile_g), ///
+		legend(order(4 "از ۲۰ تا ۲۵ درصد" 3 "از ۵ تا ۲۰ درصد" 2 "از ۱ تا ۵ درصد" 1 "از ۰ تا ۱ درصد") pos(6) row(1)) ///
+		ylab(, grid) xlab(, grid) ///
+		ytitle(درصد از مجموع سود شرکت‌ها در هر صدک) xtitle(صدک شرکت) ///
+		title(توزیع نرخ موثر مالیات قطعی شرکت در هر صدک -‍ $year‍‍) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5) range(0 1)) yla(0 0.2 0.4 0.6 0.8 1)
+	graph export CG11_$year.png, as(png) replace	
+
+	twoway ///
+		(area  zero_rate_percent_ghati_s 	percentile_g ) || ///
+		(rarea zero_rate_percent_ghati_s 	low_rate_percent_ghati_s	 percentile_g) || ///
+		(rarea low_rate_percent_ghati_s 	middle_rate_percent_ghati_s	 percentile_g) || ///
+		(rarea middle_rate_percent_ghati_s 	high_rate_percent_ghati_s	 percentile_g), ///
+		legend(order(4 "از ۲۰ تا ۲۵ درصد" 3 "از ۵ تا ۲۰ درصد" 2 "از ۱ تا ۵ درصد" 1 "از ۰ تا ۱ درصد") pos(6) row(1)) ///
+		ylab(, grid) xlab(, grid) ///
+		ytitle(درصد از شرکت‌های هر صدک) xtitle(صدک شرکت) ///
+		title(توزیع نرخ موثر مالیات قطعی شرکت در هر صدک -‍ $year‍‍) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5) range(0 1)) yla(0 0.2 0.4 0.6 0.8 1)
+	graph export CG10_$year.png, as(png) replace	
+
+	
+	
 	
 	
 	line avg_etr_ghati_percentile percentile_g, sort name(CG09_$year) ///
