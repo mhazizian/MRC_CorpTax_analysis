@@ -43,8 +43,16 @@ replace profit_ebrazi = profit_ebrazi + T26_R01 if !missing(T26_R01)
 // replace profit_ebrazi = profit_ebrazi + T26_R03 if !missing(T26_R03)
 replace profit_ebrazi = . if missing(T26_R01) //& missing(T26_R02) & missing(T26_R03) 
 
+// ############################ Cleaning phase 1 ################################
+
+replace tax_tashkhisi = 0 if tax_tashkhisi  < 10000 & tax_tashkhisi > 0
+replace tax_ghati	  = 0 if tax_ghati 		< 10000 & tax_ghati > 0
+replace profit_ebrazi = 0 if profit_ebrazi  < 10000 & profit_ebrazi > 0
+
 
 // ############################ Not Audited cases ################################
+
+
 
 gen is_not_audited = 0
 
@@ -79,35 +87,6 @@ tab actyear is_not_audited, row // 0.09% of all records.
 tab actyear is_not_audited [w=profit_ebrazi] if profit_ebrazi >= 0, row // 0.07% of total profit of all records.
 // tax_ghati in years before 1396 is not reliable.
 
-
-// ############################# Cleaning ####################################
-
-drop if missing(actyear)
-
-drop if missing(profit_ebrazi)
-drop if missing(tax_ebrazi) & missing(tax_ghati)
-
-
-// inactive corporates:
-drop if profit_ebrazi == 0
-drop if profit_ebrazi < 5 // TODO: what to do ....
-
-
-// corporate with loss:
-drop if profit_ebrazi < 0 
-
-
-// tab actyear if tax_ebrazi < 0
-replace tax_ebrazi = 0 if tax_ebrazi < 0
-drop if tax_ghati < 0
-
-// tab actyear is_not_audited, row 					 // 0.16% of all records.
-// tab actyear is_not_audited [w=profit_ebrazi], row // 0.07% of total value of all records.
-
-// drop if is_not_audited == 1
-
-
-tab actyear
 
 // ############################## Merge with Moafiat #########################
 
@@ -155,11 +134,6 @@ drop Moafiat_frame
 frame create Bakhshodegi_frame
 frame change Bakhshodegi_frame
 
-// local dir "D:\Data_Output\Hoghooghi"
-// local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-// local dir "~\Documents\Majlis RC\data\tax_return\sharif"
-
-
 use "$dir\Bakhshhodegi.dta", clear
 
 // @@@ Sharif Version.
@@ -167,7 +141,6 @@ if $is_sharif_version == 1 {
 	rename bakhshoodegiqty Rebate_Amount
 	egen trace_id = concat(actyear id), punct(_)
 }
-
 
 
 egen agr_bakhshoudegi = sum(Rebate_Amount), by(trace_id)
@@ -180,13 +153,23 @@ frget agr_bakhshoudegi, from(Bakhshodegi_frame)
 frame drop Bakhshodegi_frame
 drop Bakhshodegi_frame
 
-// ############################## Calculation! #################################
+
+// Bug fix on 1399:
+// replace agr_maghtou = 0		  if actyear == 1399 & missing(agr_maghtou) 
+// replace agr_moafiat = T26_R04 if actyear == 1399 & T26_R04 > agr_moafiat + agr_maghtou ///
+// 	& !missing(T26_R04)
+//	
+// replace agr_maghtou = 0 	  if actyear == 1399 & T26_R04 > agr_moafiat + agr_maghtou ///
+// 	& !missing(T26_R04)
+
+
+// ############################## profit Ghati ! #################################
 
 gen profit_ghati_cal = .
 replace profit_ghati_cal = tax_ghati if !missing(tax_ghati)
 replace profit_ghati_cal = profit_ghati_cal + T26_R21 if !missing(T26_R21) // maliyat daramad etefaghi
-replace profit_ghati_cal = profit_ghati_cal + agr_bakhshoudegi if !missing(agr_bakhshoudegi) // Bakhshodegi
-// replace profit_ghati_cal = profit_ghati_cal + T26_R16 if !missing(T26_R16) // Bakhshodegi
+// replace profit_ghati_cal = profit_ghati_cal + agr_bakhshoudegi if !missing(agr_bakhshoudegi) // Bakhshodegi
+replace profit_ghati_cal = profit_ghati_cal + T26_R16 if !missing(T26_R16) // Bakhshodegi
 
 replace profit_ghati_cal = profit_ghati_cal * 4
 
@@ -194,10 +177,10 @@ replace profit_ghati_cal = profit_ghati_cal + T26_R13 if !missing(T26_R13) 			//
 replace profit_ghati_cal = profit_ghati_cal + T26_R11 if !missing(T26_R11)			// Khesarat Made 165
 replace profit_ghati_cal = profit_ghati_cal + T26_R10 if !missing(T26_R10) 			// Estehlak Anbashte
 replace profit_ghati_cal = profit_ghati_cal + T26_R06 if !missing(T26_R06)			// Komak Mali Pardakhti
-replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_moafiat) 	// Moafiat
-replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_maghtou) 	// Maliat Maghtou
+replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// Moafiat
+// replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_moafiat) 	// Moafiat
+// replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_maghtou) 	// Maliat Maghtou
 replace profit_ghati_cal = profit_ghati_cal + T26_004 if !missing(T26_004) 			// Maliat Maghtou
-// replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// Moafiat
 replace profit_ghati_cal = profit_ghati_cal - T26_R02 if !missing(T26_R02) 			// going for Sood Vije
 replace profit_ghati_cal = profit_ghati_cal - T26_R03 if !missing(T26_R03) 			// going for Sood Vije
 replace profit_ghati_cal = profit_ghati_cal - T26_R08 if !missing(T26_R08) 			// Zian Gheir Moaf
@@ -211,9 +194,49 @@ replace profit_ghati_cal = profit_ebrazi if profit_ghati_cal < profit_ebrazi ///
 
 
 
+// ############################# Cleaning ####################################
+
+drop if missing(actyear)
+drop if missing(tax_ebrazi) & missing(tax_ghati)
+
+drop if missing(profit_ebrazi) & missing(profit_ghati_cal)
+
+// corporate with loss:
+drop if profit_ebrazi < 0 & profit_ghati_cal < 0
+
+
+// inactive corporates:
+replace profit_ebrazi 	 = 0 if profit_ebrazi 	 < 10000 & profit_ebrazi > 0 
+replace profit_ghati_cal = 0 if profit_ghati_cal < 10000 & profit_ghati_cal > 0 
+
+
+// tab actyear if tax_ebrazi < 0
+replace tax_ebrazi = 0 if tax_ebrazi < 0
+drop if tax_ghati < 0
+
+replace profit_ebrazi = .    if profit_ebrazi <= 0
+replace profit_ghati_cal = . if profit_ghati_cal <= 0
+// drop if profit_ebrazi == 0 & profit_ghati_cal == 0
+
+
+// tab actyear is_not_audited, row 					 // 0.16% of all records.
+// tab actyear is_not_audited [w=profit_ebrazi], row // 0.07% of total value of all records.
+
+// drop if is_not_audited == 1
+
+
+tab actyear
+
+
+// ############################## Calculation #################################
+
 gen etr_ebrazi  = tax_ebrazi / profit_ebrazi
 gen etr_ghati  = tax_ghati / profit_ebrazi 
 gen etr_ghati_s = tax_ghati / profit_ghati_cal
+
+replace etr_ebrazi = .	 if etr_ebrazi < 0
+replace etr_ghati = . 	 if etr_ghati < 0
+replace etr_ghati_s = .	 if etr_ghati_s < 0
 
 
 gen etr_ebrazi2 = etr_ebrazi
@@ -233,15 +256,22 @@ gen lost_income_ghati  = (profit_ebrazi * 0.25 - tax_ghati)
 	replace lost_income_ghati = 0 if lost_income_ghati < 0
 	
 gen lost_income_ebrazi2 = 0
-	replace lost_income_ebrazi2 = lost_income_ebrazi2 + agr_moafiat * 0.25 if !missing(agr_moafiat)
-	replace lost_income_ebrazi2 = lost_income_ebrazi2 + agr_bakhshoudegi if !missing(agr_bakhshoudegi)
+	replace lost_income_ebrazi2 = lost_income_ebrazi2 + T26_R04		 * 0.25 if !missing(T26_R04)
+	replace lost_income_ebrazi2 = lost_income_ebrazi2 - agr_maghtou	 * 0.25 if !missing(agr_maghtou)
+// 	replace lost_income_ebrazi2 = lost_income_ebrazi2 + agr_moafiat * 0.25 if !missing(agr_moafiat)
+
+	replace lost_income_ebrazi2 = lost_income_ebrazi2 + T26_R16 if !missing(T26_R16)
+// 	replace lost_income_ebrazi2 = lost_income_ebrazi2 + agr_bakhshoudegi if !missing(agr_bakhshoudegi)
+
 	replace lost_income_ebrazi2 = 0 if lost_income_ebrazi2 < 0
-	replace lost_income_ebrazi2 = . if missing(agr_moafiat) & missing(agr_bakhshoudegi)
+	replace lost_income_ebrazi2 = . if missing(T26_R04) & missing(T26_R16)
+	replace lost_income_ebrazi2 = 0 if profit_ghati_cal < 1000
+// 	replace lost_income_ebrazi2 = . if missing(agr_moafiat) & missing(agr_bakhshoudegi)
 
 	
 // TODO: check this #outlier fix.
-drop if etr_ghati_s > 10 & !missing(etr_ghati_s)
-drop if etr_ebrazi  > 10 & !missing(etr_ebrazi)
+replace etr_ghati_s = . if etr_ghati_s > 10 & !missing(etr_ghati_s)
+replace etr_ebrazi = . 	if etr_ebrazi  > 10 & !missing(etr_ebrazi)
 
 // replace etr_ghati_s = 10 if etr_ghati_s > 10 & !missing(etr_ghati_s)
 
@@ -255,13 +285,13 @@ drop if flag == 0
 drop flag
 
 
-// ############################### Deciles ##############################
+// ############################### Percentile ##############################
 
 // egen percentile = xtile(profit_ebrazi) 		, by(actyear) nq(100)
 // egen percentile_g = xtile(profit_ghati_cal) , by(actyear) nq(100)
-astile percentile 	= profit_ebrazi		, nq(100) by(actyear)
-astile percentile_g = profit_ghati_cal	, nq(100) by(actyear)
-
+// astile percentile 	= profit_ebrazi		if profit_ebrazi > 0	, nq(100) by(actyear)
+astile percentile_g = profit_ghati_cal	if profit_ghati_cal > 0 , nq(200) by(actyear)
+replace percentile_g = percentile_g / 2
 
 
 replace profit_ghati_cal = -1 if missing(profit_ghati_cal)	
@@ -271,22 +301,24 @@ bysort actyear (profit_ghati_cal): gen top500 = (_N - _n < 500)
 bysort actyear (profit_ghati_cal): gen top200 = (_N - _n < 200)
 replace profit_ghati_cal = . if profit_ghati_cal == -1	
 
-egen avg_profit_percentile   = mean(profit_ebrazi)		, by(actyear percentile)
+
+
+egen avg_profit_percentile   = mean(profit_ebrazi)		, by(actyear percentile_g)
 egen avg_profit_g_percentile = mean(profit_ghati_cal)	, by(actyear percentile_g)
 
-egen sum_profit_percentile   = sum(profit_ebrazi), by(actyear percentile)
+egen sum_profit_percentile   = sum(profit_ebrazi), by(actyear percentile_g)
 egen sum_profit_g_percentile = sum(profit_ghati_cal), by(actyear percentile_g)
 
 egen sum_profit_g_prct_zero_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.01)) , by(actyear percentile_g)
 egen sum_profit_g_prct_low_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.05)) , by(actyear percentile_g)
-egen sum_profit_g_prct_middle_rate 	= sum(profit_ghati_cal * (etr_ghati_s <= 0.2)) , by(actyear percentile_g)
+egen sum_profit_g_prct_middle_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.2)) , by(actyear percentile_g)
 egen sum_profit_g_prct_high_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.25)) , by(actyear percentile_g)
 
 
-egen zero_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.01)	, by(actyear percentile)
+egen zero_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.01)	, by(actyear percentile_g)
 egen zero_rate_percent_ghati    = mean(etr_ghati <= 0.01)   , by(actyear percentile_g)
 egen zero_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.01) , by(actyear percentile_g)
-egen zero_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.01) / sum_profit_g_percentile) ///
+egen zero_rate_percent_ghati_sw = sum(profit_ghati_cal * (etr_ghati_s <= 0.01) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
 
 label variable zero_rate_percent_ghati_s "سهم شرکت‌های با نرخ موثر قطعی ۰ تا ۱ درصد از کل سود در سال و صدک"
@@ -294,19 +326,19 @@ label variable zero_rate_percent_ebrazi "سهم شرکت‌های با نرخ م
 
 
 	
-egen low_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.05)	, by(actyear percentile)
+egen low_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.05)	, by(actyear percentile_g)
 egen low_rate_percent_ghati    = mean(etr_ghati <= 0.05)    , by(actyear percentile_g)
 egen low_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.05)  , by(actyear percentile_g)
 egen low_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.05) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
 
-egen middle_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.2)	, by(actyear percentile)
+egen middle_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.2)	, by(actyear percentile_g)
 egen middle_rate_percent_ghati    = mean(etr_ghati <= 0.2)    , by(actyear percentile_g)
 egen middle_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.2)  , by(actyear percentile_g)
 egen middle_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.2) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
 
-egen high_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.25)	, by(actyear percentile)
+egen high_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.25)	, by(actyear percentile_g)
 egen high_rate_percent_ghati    = mean(etr_ghati <= 0.25)    , by(actyear percentile_g)
 egen high_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.25)  , by(actyear percentile_g)
 egen high_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.25) / sum_profit_g_percentile) ///
@@ -314,7 +346,7 @@ egen high_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.25) 
 
 
 egen avg_etr_ghati_percentile  = mean(etr_ghati_s), by(actyear percentile_g)
-egen avg_etr_ebrazi_percentile = mean(etr_ebrazi) if etr_ebrazi < 20, by(actyear percentile)
+egen avg_etr_ebrazi_percentile = mean(etr_ebrazi) if etr_ebrazi < 20, by(actyear percentile_g)
 
 
 gen etr_tag = .
@@ -331,7 +363,7 @@ label define etr_tag_label ///
 label values etr_tag etr_tag_label
 
 // Lost Income:
-egen sum_lost_income_percentile = sum(lost_income_ebrazi2), by(actyear percentile)
+egen sum_lost_income_percentile = sum(lost_income_ebrazi2), by(actyear percentile_g)
 // gen tax_exp_to_profit_eb = avg_lost_income_percentile_eb / avg_profit_percentile
 // egen tax_exp_to_profit_eb = mean(lost_income_ebrazi2 / profit_ebrazi), by(actyear percentile)
 
