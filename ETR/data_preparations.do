@@ -303,8 +303,8 @@ drop flag
 // egen percentile = xtile(profit_ebrazi) 		, by(actyear) nq(100)
 // egen percentile_g = xtile(profit_ghati_cal) , by(actyear) nq(100)
 // astile percentile 	= profit_ebrazi		if profit_ebrazi > 0	, nq(100) by(actyear)
-astile percentile_g = profit_ghati_cal	if profit_ghati_cal > 0 , nq(200) by(actyear)
-replace percentile_g = percentile_g / 2
+astile percentile_g = profit_ghati_cal	if profit_ghati_cal > 0 , nq(100) by(actyear)
+astile p100_decile = profit_ghati_cal	if percentile_g == 100  , nq(10) by(actyear)
 
 
 replace profit_ghati_cal = -1 if missing(profit_ghati_cal)	
@@ -333,7 +333,8 @@ egen zero_rate_percent_ghati    = mean(etr_ghati <= 0.01)   , by(actyear percent
 egen zero_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.01) , by(actyear percentile_g)
 egen zero_rate_percent_ghati_sw = sum(profit_ghati_cal * (etr_ghati_s <= 0.01) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
-
+egen zero_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.01) , by(actyear p100_decile)
+	
 label variable zero_rate_percent_ghati_s "سهم شرکت‌های با نرخ موثر قطعی ۰ تا ۱ درصد از کل سود در سال و صدک"
 label variable zero_rate_percent_ebrazi "سهم شرکت‌های با نرخ موثر ابرازی ۰ تا ۱ درصد از کل سود در سال و صدک"
 
@@ -344,18 +345,21 @@ egen low_rate_percent_ghati    = mean(etr_ghati <= 0.05)    , by(actyear percent
 egen low_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.05)  , by(actyear percentile_g)
 egen low_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.05) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
+egen low_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.05)  , by(actyear p100_decile)
 
 egen middle_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.2)	, by(actyear percentile_g)
 egen middle_rate_percent_ghati    = mean(etr_ghati <= 0.2)    , by(actyear percentile_g)
 egen middle_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.2)  , by(actyear percentile_g)
 egen middle_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.2) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
+egen middle_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.2)  , by(actyear p100_decile)
 
 egen high_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.25)	, by(actyear percentile_g)
 egen high_rate_percent_ghati    = mean(etr_ghati <= 0.25)    , by(actyear percentile_g)
 egen high_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.25)  , by(actyear percentile_g)
 egen high_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.25) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
+egen high_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.25)  , by(actyear p100_decile)
 
 
 egen avg_etr_ghati_percentile  = mean(etr_ghati_s), by(actyear percentile_g)
