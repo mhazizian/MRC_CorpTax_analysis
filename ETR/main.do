@@ -114,7 +114,7 @@ egen t_profit_ebrazi_by_activity = sum(profit_ebrazi)	, by(actyear T00_ActivityT
 egen t_profit_ghati_by_activity = sum(profit_ghati_cal)	, by(actyear T00_ActivityTypeName)
 egen t_tax_ebrazi_by_activity = sum(tax_ebrazi)			, by(actyear T00_ActivityTypeName)
 egen t_tax_ghati_by_activity = sum(tax_ghati)			, by(actyear T00_ActivityTypeName)
-egen count_by_activity = count(!missing(trace_id))		, by(actyear T00_ActivityTypeName)
+egen count_by_activity = sum(!missing(trace_id))		, by(actyear T00_ActivityTypeName)
 
 gen etr_ebrazi_by_activity = t_tax_ebrazi_by_activity / t_profit_ebrazi_by_activity
 gen etr_ghati_by_activity  = t_tax_ghati_by_activity  / t_profit_ghati_by_activity

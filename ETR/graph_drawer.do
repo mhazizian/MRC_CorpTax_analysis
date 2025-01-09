@@ -169,7 +169,20 @@ graph drop _all
 		ytitle(درصد از شرکت‌های هر صدک) xtitle(صدک شرکت) ///
 		title(توزیع نرخ موثر مالیات قطعی شرکت در هر صدک -‍ $year‍‍) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5) range(0 1)) yla(0 0.2 0.4 0.6 0.8 1)
-	graph export CG10_$year.png, as(png) replace	
+	graph export CG10_$year.png, as(png) replace
+	
+	
+	twoway ///
+		(area  zero_rate_percent_ghati_s_p100 		p100_decile ) || ///
+		(rarea zero_rate_percent_ghati_s_p100 		low_rate_percent_ghati_s_p100		 p100_decile) || ///
+		(rarea low_rate_percent_ghati_s_p100 		middle_rate_percent_ghati_s_p100	 p100_decile) || ///
+		(rarea middle_rate_percent_ghati_s_p100 	high_rate_percent_ghati_s_p100		 p100_decile), ///
+		legend(order(4 "از ۲۰ تا ۲۵ درصد" 3 "از ۵ تا ۲۰ درصد" 2 "از ۱ تا ۵ درصد" 1 "از ۰ تا ۱ درصد") pos(6) row(1)) ///
+		ylab(, grid) xlab(, grid) ///
+		ytitle(درصد از شرکت‌ها) xtitle(دهک در صدک ۱۰۰ ام) ///
+		title(توزیع نرخ موثر مالیات قطعی شرکت در صدک ۱۰۰ ام-‍ $year‍‍) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5) range(0 1)) yla(0 0.2 0.4 0.6 0.8 1)
+	graph export CG14_$year.png, as(png) replace
 
 
 
