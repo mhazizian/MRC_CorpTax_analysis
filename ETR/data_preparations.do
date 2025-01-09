@@ -167,7 +167,15 @@ drop Bakhshodegi_frame
 
 gen profit_ghati_cal = .
 replace profit_ghati_cal = tax_ghati if !missing(tax_ghati)
-replace profit_ghati_cal = profit_ghati_cal + T26_R21 if !missing(T26_R21) // maliyat daramad etefaghi
+
+// replace profit_ghati_cal = profit_ghati_cal + T26_R24 if !missing(T26_R24) // Jayeze M.190 -- NO DATA
+// replace profit_ghati_cal = profit_ghati_cal + T26_R22 if !missing(T26_R22) // Jayeze Khosh hesabi -- NO DATA
+
+replace profit_ghati_cal = profit_ghati_cal - T26_R21 if !missing(T26_R21) // maliyat daramad etefaghi
+// replace profit_ghati_cal = profit_ghati_cal + T26_R18 if !missing(T26_R18) // Tabsare 2 M.169 -- NO DATA
+// replace profit_ghati_cal = profit_ghati_cal + T26_R17 if !missing(T26_R17) // Foreign Tax -- NO DATA
+
+********  Bakhshoodegi *******
 // replace profit_ghati_cal = profit_ghati_cal + agr_bakhshoudegi if !missing(agr_bakhshoudegi) // Bakhshodegi
 replace profit_ghati_cal = profit_ghati_cal + T26_R16 if !missing(T26_R16) // Bakhshodegi
 
@@ -177,9 +185,14 @@ replace profit_ghati_cal = profit_ghati_cal + T26_R13 if !missing(T26_R13) 			//
 replace profit_ghati_cal = profit_ghati_cal + T26_R11 if !missing(T26_R11)			// Khesarat Made 165
 replace profit_ghati_cal = profit_ghati_cal + T26_R10 if !missing(T26_R10) 			// Estehlak Anbashte
 replace profit_ghati_cal = profit_ghati_cal + T26_R06 if !missing(T26_R06)			// Komak Mali Pardakhti
+
+
+********  Moafiat *******
 replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// Moafiat
 // replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_moafiat) 	// Moafiat
 // replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_maghtou) 	// Maliat Maghtou
+
+
 replace profit_ghati_cal = profit_ghati_cal + T26_004 if !missing(T26_004) 			// Maliat Maghtou
 replace profit_ghati_cal = profit_ghati_cal - T26_R02 if !missing(T26_R02) 			// going for Sood Vije
 replace profit_ghati_cal = profit_ghati_cal - T26_R03 if !missing(T26_R03) 			// going for Sood Vije
@@ -271,7 +284,7 @@ gen lost_income_ebrazi2 = 0
 	
 // TODO: check this #outlier fix.
 replace etr_ghati_s = . if etr_ghati_s > 10 & !missing(etr_ghati_s)
-replace etr_ebrazi = . 	if etr_ebrazi  > 10 & !missing(etr_ebrazi)
+replace etr_ebrazi  = . if etr_ebrazi  > 10 & !missing(etr_ebrazi)
 
 // replace etr_ghati_s = 10 if etr_ghati_s > 10 & !missing(etr_ghati_s)
 
