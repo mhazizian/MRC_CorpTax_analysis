@@ -1,4 +1,6 @@
 
+frame change default
+
 frame create Moafiat_frame
 frame change Moafiat_frame
 
@@ -15,10 +17,11 @@ if $is_sharif_version == 1 {
 	local maliat_maghtoo_code 37
 	egen trace_id = concat(actyear id), punct(_)
 	rename activity exemption_description
+	replace exemption_description = ""
 }
 
 // Maliat Maghtoo
-drop if exemption_id == `maliat_maghtoo_code'
+// drop if exemption_id == `maliat_maghtoo_code'
 
 frlink m:1 trace_id		, frame(default)
 frget percentile_g		, from(default)
@@ -29,46 +32,34 @@ frget profit_ebrazi		, from(default)
 frget profit_ghati_cal	, from(default)
 
 
-// foreach vp in percentile percentile_g {
-foreach vp in percentile_g {
-	preserve
-		keep if `vp' == 100
-		egen agr_li_moafiat = sum(Exempted_Profit * 0.25), by(exemption_id actyear)
-		egen corp_count = count(id), by(exemption_id actyear)
+preserve
+	// TODO: check this decision.
+	drop if Exempted_Profit < 0
+	
+	egen agr_li_moafiat_all = sum(Exempted_Profit * 0.25), by(exemption_id actyear)
+	egen corp_count_all = count(id), by(exemption_id actyear)
+	
+	egen agr_li_moafiat_lp = sum(Exempted_Profit * 0.25 * (etr_ghati_s <= 0.01)), by(exemption_id actyear)
+	egen corp_count_lp = sum(int(etr_ghati_s <= 0.01 & Exempted_Profit > 0 & !missing(Exempted_Profit))), by(exemption_id actyear)
 		
-		keep actyear ///
-			exemption_id ///
-			exemption_description ///
-			agr_li_moafiat ///
-			corp_count
+	egen agr_li_moafiat_p100 = sum(Exempted_Profit * 0.25 * (percentile_g == 100)), by(exemption_id actyear)
+	egen corp_count_p100 = sum(int(Exempted_Profit > 0 & !missing(Exempted_Profit) & (percentile_g == 100))), by(exemption_id actyear)
+	
+	keep actyear ///
+		exemption_id ///
+		exemption_description ///
+		agr_li_moafiat_p100 ///
+		corp_count_p100 ///
+		agr_li_moafiat_all ///
+		corp_count_all ///
+		agr_li_moafiat_lp ///
+		corp_count_lp 
 
-		duplicates drop
-		gsort -agr_li_moafiat	
-		export excel "Moafiat_`vp'100_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
-	restore
-}
-
-
-foreach v_etr in etr_ebrazi etr_ghati_s {
-// 	foreach etr in 0.01 0.05 {
-	foreach etr in 0.01 {
-		preserve
-			keep if `v_etr' <= `etr'
-			egen agr_li_moafiat = sum(Exempted_Profit * 0.25), by(exemption_id actyear)
-			egen corp_count = count(id), by(exemption_id actyear)
-			
-			keep actyear ///
-				exemption_id ///
-				exemption_description ///
-				agr_li_moafiat ///
-				corp_count
-
-			duplicates drop
-			gsort -agr_li_moafiat	
-			export excel "Moafiat_`v_etr'_Le`etr'p_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
-		restore
-	}
-}
+		
+	duplicates drop
+	gsort -agr_li_moafiat_all	
+	export excel "Moafiat_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
+restore
 
 
 
@@ -90,6 +81,7 @@ if $is_sharif_version == 1 {
 	egen trace_id = concat(actyear id), punct(_)
 	rename bakhshoodegi_code bakhshoodegi_id
 	rename activity bakhshoodegi_description
+	replace bakhshoodegi_description = ""
 }
 
 
@@ -107,43 +99,35 @@ frget profit_ebrazi		, from(default)
 frget profit_ghati_cal	, from(default)
 
 
-foreach vp in percentile_g {
-	preserve
-		keep if `vp' == 100
-		egen agr_li_bakhshoodegi = sum(Rebate_Amount), by(bakhshoodegi_id actyear)
-		egen corp_count = count(id), by(bakhshoodegi_id actyear)
+preserve
+	drop if Rebate_Amount < 0
+	egen agr_li_bakhshoodegi_all = sum(Rebate_Amount), by(bakhshoodegi_id actyear)
+	egen corp_count_all = count(id), by(bakhshoodegi_id actyear)
+	
+	egen agr_li_bakhshoodegi_lp = sum(Rebate_Amount * 0.25 * (etr_ghati_s <= 0.01)), by(bakhshoodegi_id actyear)
+	egen corp_count_lp = sum(int(etr_ghati_s <= 0.01 & Rebate_Amount > 0 & !missing(Rebate_Amount))), by(bakhshoodegi_id actyear)
 		
-		keep actyear ///
-			bakhshoodegi_id ///
-			bakhshoodegi_description ///
-			agr_li_bakhshoodegi ///
-			corp_count
+	egen agr_li_bakhshoodegi_p100 = sum(Rebate_Amount * 0.25), by(bakhshoodegi_id actyear)
+	egen corp_count_p100 = sum(int(Rebate_Amount > 0 & !missing(Rebate_Amount))), by(bakhshoodegi_id actyear)
 
-		duplicates drop
-		gsort -agr_li_bakhshoodegi	
-		export excel "Bakhshoodegi_`vp'100_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
-	restore
-}
+	egen agr_li_bakhshoodegi_p100 = sum(Rebate_Amount * 0.25 * (percentile_g == 100)), by(bakhshoodegi_id actyear)
+	egen corp_count_p100 = sum(int(Rebate_Amount > 0 & !missing(Rebate_Amount) & (percentile_g == 100))), by(bakhshoodegi_id actyear)
+	
+	keep actyear ///
+		bakhshoodegi_id ///
+		bakhshoodegi_description ///
+		agr_li_bakhshoodegi_p100 ///
+		corp_count_p100 ///
+		agr_li_bakhshoodegi_all ///
+		corp_count_all ///
+		agr_li_bakhshoodegi_lp ///
+		corp_count_lp
 
-foreach v_etr in etr_ebrazi etr_ghati_s {
-	foreach etr in 0.01 {
-		preserve
-			keep if `v_etr' <= `etr'
-			egen agr_li_bakhshoodegi = sum(Rebate_Amount), by(bakhshoodegi_id actyear)
-			egen corp_count = count(id), by(bakhshoodegi_id actyear)
-			
-			keep actyear ///
-				bakhshoodegi_id ///
-				bakhshoodegi_description ///
-				agr_li_bakhshoodegi ///
-				corp_count
-
-			duplicates drop
-			gsort -agr_li_bakhshoodegi	
-			export excel "Bakhshoodegi_`v_etr'_Le`etr'p_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
-		restore
-	}
-}
+		
+	duplicates drop
+	gsort -agr_li_bakhshoodegi_all
+	export excel "Bakhshoodegi_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
+restore
 
 frame change default
 frame drop Bakhshodegi_frame
