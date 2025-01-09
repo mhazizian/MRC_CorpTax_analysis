@@ -24,7 +24,12 @@ global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 do "ETR/data_preparations.do"
 
 save "corp_cleaned_data_isSharif$is_sharif_version.dta", replace
-// use "corp_cleaned_data_isSharif$is_sharif_version.dta", clear
+use "corp_cleaned_data_isSharif$is_sharif_version.dta", clear
+
+// replace agr_moafiat = 0 if missing(agr_moafiat)
+// replace agr_bakhshoudegi = 0 if missing(agr_bakhshoudegi)
+// gen agr_m = agr_moafiat + agr_maghtou 
+// tabstat agr_moafiat agr_m T26_R04 agr_bakhshoudegi T26_R16, s(sum) by(actyear)
 
 
 // ####### Yearly Charts ########
@@ -74,7 +79,7 @@ egen lp_profit_share_ghati   = sum(profit_ghati_cal * (etr_ghati_s  <= `percent'
 label variable lp_profit_share_ghati "سهم شرکت‌های با نرخ موثر قطعی ۰ تا ۱ درصد از کل سود در سال"
 
 preserve
-	keep if percentile == 100 & percentile_g == 100
+	keep if percentile_g == 100
 	keep actyear ///
 		etr_ebrazi_agr_yearly ///
 		etr_ghati_agr_yearly ///
@@ -109,21 +114,28 @@ egen t_profit_ebrazi_by_activity = sum(profit_ebrazi)	, by(actyear T00_ActivityT
 egen t_profit_ghati_by_activity = sum(profit_ghati_cal)	, by(actyear T00_ActivityTypeName)
 egen t_tax_ebrazi_by_activity = sum(tax_ebrazi)			, by(actyear T00_ActivityTypeName)
 egen t_tax_ghati_by_activity = sum(tax_ghati)			, by(actyear T00_ActivityTypeName)
-egen count_by_activity = count(id)						, by(actyear T00_ActivityTypeName)
+egen count_by_activity = count(!missing(trace_id))		, by(actyear T00_ActivityTypeName)
 
 gen etr_ebrazi_by_activity = t_tax_ebrazi_by_activity / t_profit_ebrazi_by_activity
 gen etr_ghati_by_activity  = t_tax_ghati_by_activity  / t_profit_ghati_by_activity
 
-egen sum_lost_income_ebrazi_by_act = sum(lost_income_ebrazi2), by(actyear T00_ActivityTypeName)
+egen t_lost_income_by_act = sum(lost_income_ebrazi2), by(actyear T00_ActivityTypeName)
+
 
 egen count_percentile100 = sum(percentile_g == 100)		, by(actyear T00_ActivityTypeName)
 egen t_profit_ghati_p100_by_activity = sum(profit_ghati_cal * (percentile_g == 100)) ///
 		, by(actyear T00_ActivityTypeName)
+egen t_tax_ghati_p100_by_activity = sum(tax_ghati * (percentile_g == 100)) ///
+		, by(actyear T00_ActivityTypeName)
+egen t_lost_income_by_act_p100 = sum(lost_income_ebrazi2 * (percentile_g == 100)), by(actyear T00_ActivityTypeName)
+
+
 
 
 // TODO: top corp Sector analyis
 preserve
 	keep if percentile_g == 100
+	
 	keep actyear ///
 		T00_ActivityTypeName ///
 		count_by_activity ///
@@ -133,12 +145,14 @@ preserve
 		t_tax_ghati_by_activity ///
 		etr_ebrazi_by_activity ///
 		etr_ghati_by_activity ///
-		sum_lost_income_ebrazi_by_act /*
+		t_lost_income_by_act /*
 		
 		percentile 100:
 		
 		*/ count_percentile100 ///
-		t_profit_ghati_p100_by_activity
+		t_profit_ghati_p100_by_activity ///
+		t_tax_ghati_p100_by_activity ///
+		t_lost_income_by_act_p100
 
 	duplicates drop
 	export excel "Corp by ActivityType.xlsx", firstrow(varl) replace
