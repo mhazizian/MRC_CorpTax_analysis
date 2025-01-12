@@ -25,7 +25,7 @@ if $is_sharif_version == 1 {
 
 frlink m:1 trace_id		, frame(default)
 frget percentile_g		, from(default)
-frget percentile		, from(default)
+// frget percentile		, from(default)
 frget etr_ghati_s		, from(default)
 frget etr_ebrazi		, from(default)
 frget profit_ebrazi		, from(default)
@@ -86,13 +86,11 @@ if $is_sharif_version == 1 {
 
 
 drop if missing(actyear)
-// local maliat_maghtoo_code 35
-// Maliat Maghtoo
-// drop if exemption_id == `maliat_maghtoo_code'
+
 
 frlink m:1 trace_id		, frame(default)
 frget percentile_g		, from(default)
-frget percentile		, from(default)
+// frget percentile		, from(default)
 frget etr_ghati_s		, from(default)
 frget etr_ebrazi		, from(default)
 frget profit_ebrazi		, from(default)
@@ -102,15 +100,12 @@ frget profit_ghati_cal	, from(default)
 preserve
 	drop if Rebate_Amount < 0
 	egen agr_li_bakhshoodegi_all = sum(Rebate_Amount), by(bakhshoodegi_id actyear)
-	egen corp_count_all = count(id), by(bakhshoodegi_id actyear)
+	egen corp_count_all = sum(int(Rebate_Amount > 0 & !missing(Rebate_Amount))), by(bakhshoodegi_id actyear)
 	
-	egen agr_li_bakhshoodegi_lp = sum(Rebate_Amount * 0.25 * (etr_ghati_s <= 0.01)), by(bakhshoodegi_id actyear)
+	egen agr_li_bakhshoodegi_lp = sum(Rebate_Amount * (etr_ghati_s <= 0.01)), by(bakhshoodegi_id actyear)
 	egen corp_count_lp = sum(int(etr_ghati_s <= 0.01 & Rebate_Amount > 0 & !missing(Rebate_Amount))), by(bakhshoodegi_id actyear)
-		
-	egen agr_li_bakhshoodegi_p100 = sum(Rebate_Amount * 0.25), by(bakhshoodegi_id actyear)
-	egen corp_count_p100 = sum(int(Rebate_Amount > 0 & !missing(Rebate_Amount))), by(bakhshoodegi_id actyear)
 
-	egen agr_li_bakhshoodegi_p100 = sum(Rebate_Amount * 0.25 * (percentile_g == 100)), by(bakhshoodegi_id actyear)
+	egen agr_li_bakhshoodegi_p100 = sum(Rebate_Amount  * (percentile_g == 100)), by(bakhshoodegi_id actyear)
 	egen corp_count_p100 = sum(int(Rebate_Amount > 0 & !missing(Rebate_Amount) & (percentile_g == 100))), by(bakhshoodegi_id actyear)
 	
 	keep actyear ///
