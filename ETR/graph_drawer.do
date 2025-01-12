@@ -171,7 +171,7 @@ graph drop _all
 		xscale(titlegap(2.5)) yscale(titlegap(1.5) range(0 1)) yla(0 0.2 0.4 0.6 0.8 1)
 	graph export CG10_$year.png, as(png) replace
 	
-	
+	sort p100_decile
 	twoway ///
 		(area  zero_rate_percent_ghati_s_p100 		p100_decile ) || ///
 		(rarea zero_rate_percent_ghati_s_p100 		low_rate_percent_ghati_s_p100		 p100_decile) || ///

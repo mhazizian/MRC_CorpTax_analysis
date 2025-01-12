@@ -207,7 +207,7 @@ replace profit_ghati_cal = profit_ebrazi if profit_ghati_cal < profit_ebrazi ///
 
 
 
-// ############################# Cleaning ####################################
+// ############################# Cleaning phase 2 ####################################
 
 drop if missing(actyear)
 drop if missing(tax_ebrazi) & missing(tax_ghati)
@@ -227,8 +227,8 @@ replace profit_ghati_cal = 0 if profit_ghati_cal < 10000 & profit_ghati_cal > 0
 replace tax_ebrazi = 0 if tax_ebrazi < 0
 drop if tax_ghati < 0
 
-replace profit_ebrazi = .    if profit_ebrazi <= 0
-replace profit_ghati_cal = . if profit_ghati_cal <= 0
+replace profit_ebrazi = .    if profit_ebrazi < 0
+replace profit_ghati_cal = . if profit_ghati_cal < 0
 // drop if profit_ebrazi == 0 & profit_ghati_cal == 0
 
 
