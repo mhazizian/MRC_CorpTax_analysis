@@ -302,7 +302,7 @@ drop flag
 
 // egen percentile = xtile(profit_ebrazi) 		, by(actyear) nq(100)
 // egen percentile_g = xtile(profit_ghati_cal) , by(actyear) nq(100)
-// astile percentile 	= profit_ebrazi		if profit_ebrazi > 0	, nq(100) by(actyear)
+astile percentile 	= profit_ebrazi		if profit_ebrazi > 0	, nq(100) by(actyear)
 astile percentile_g = profit_ghati_cal	if profit_ghati_cal > 0 , nq(100) by(actyear)
 astile p100_decile = profit_ghati_cal	if percentile_g == 100  , nq(10) by(actyear)
 
@@ -323,9 +323,18 @@ egen sum_profit_percentile   = sum(profit_ebrazi), by(actyear percentile_g)
 egen sum_profit_g_percentile = sum(profit_ghati_cal), by(actyear percentile_g)
 
 egen sum_profit_g_prct_zero_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.01)) , by(actyear percentile_g)
-egen sum_profit_g_prct_low_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.05)) , by(actyear percentile_g)
+egen sum_profit_g_prct_low_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.1)) , by(actyear percentile_g)
 egen sum_profit_g_prct_middle_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.2)) , by(actyear percentile_g)
 egen sum_profit_g_prct_high_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.25)) , by(actyear percentile_g)
+
+
+egen sum_profit_g_p100_d_zero_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.01)) , by(actyear p100_decile)
+egen sum_profit_g_p100_d_low_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.1)) , by(actyear p100_decile)
+egen sum_profit_g_p100_d_middle_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.2)) , by(actyear p100_decile)
+egen sum_profit_g_p100_d_high_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.25)) , by(actyear p100_decile)
+
+
+
 
 
 egen zero_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.01)	, by(actyear percentile_g)
@@ -338,14 +347,14 @@ egen zero_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.01) , by(actyear p1
 label variable zero_rate_percent_ghati_s "سهم شرکت‌های با نرخ موثر قطعی ۰ تا ۱ درصد از کل سود در سال و صدک"
 label variable zero_rate_percent_ebrazi "سهم شرکت‌های با نرخ موثر ابرازی ۰ تا ۱ درصد از کل سود در سال و صدک"
 
-
 	
-egen low_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.05)	, by(actyear percentile_g)
-egen low_rate_percent_ghati    = mean(etr_ghati <= 0.05)    , by(actyear percentile_g)
-egen low_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.05)  , by(actyear percentile_g)
-egen low_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.05) / sum_profit_g_percentile) ///
+egen low_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.1)	, by(actyear percentile_g)
+egen low_rate_percent_ghati    = mean(etr_ghati <= 0.1)    , by(actyear percentile_g)
+egen low_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.1)  , by(actyear percentile_g)
+egen low_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.1) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
-egen low_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.05)  , by(actyear p100_decile)
+egen low_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.1)  , by(actyear p100_decile)
+
 
 egen middle_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.2)	, by(actyear percentile_g)
 egen middle_rate_percent_ghati    = mean(etr_ghati <= 0.2)    , by(actyear percentile_g)
@@ -353,6 +362,7 @@ egen middle_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.2)  , by(actyear perce
 egen middle_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.2) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
 egen middle_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.2)  , by(actyear p100_decile)
+
 
 egen high_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.25)	, by(actyear percentile_g)
 egen high_rate_percent_ghati    = mean(etr_ghati <= 0.25)    , by(actyear percentile_g)
@@ -369,13 +379,13 @@ egen avg_etr_ebrazi_percentile = mean(etr_ebrazi) if etr_ebrazi < 20, by(actyear
 gen etr_tag = .
 replace etr_tag = 4 if etr_ghati_s <= 0.25
 replace etr_tag = 3 if etr_ghati_s <= 0.2
-replace etr_tag = 2 if etr_ghati_s <= 0.05
+replace etr_tag = 2 if etr_ghati_s <= 0.1
 replace etr_tag = 1 if etr_ghati_s <= 0.01
 
 label define etr_tag_label ///
 	1 "از ۰ تا ۱ درصد" ///
-	2 "از ۱ تا ۵ درصد" ///
-	3 "از ۵ تا ۲۰ درصد" ///
+	2 "از ۱ تا ۱۰ درصد" ///
+	3 "از ۱۰ تا ۲۰ درصد" ///
 	4 "از ۲۰ تا ۲۵ درصد"
 label values etr_tag etr_tag_label
 
