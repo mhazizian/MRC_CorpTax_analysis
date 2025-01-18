@@ -1,8 +1,3 @@
-clear
-frame reset
-graph set window fontface "B Nazanin"
-graph drop _all
-
 // ssc install egenmore
 // ssc inst _gwtmean, replace
 // ssc install niceloglabels 
@@ -13,9 +8,15 @@ graph drop _all
 set scheme cleanplots, perm
 
 
-global is_sharif_version 1
-// global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-global dir "~\Documents\Majlis RC\data\tax_return\sharif"
+clear
+frame reset
+graph set window fontface "B Nazanin"
+graph drop _all
+
+
+global is_sharif_version 0
+global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+// global dir "~\Documents\Majlis RC\data\tax_return\sharif"
 // global dir "D:\Data_Output\Hoghooghi"
 
 
@@ -34,7 +35,7 @@ use "corp_cleaned_data_isSharif$is_sharif_version.dta", clear
 
 // ####### Yearly Charts ########
 
-global year 1399
+global year 1400
 do "ETR/graph_drawer.do"
 
 // ####### Moafiat & Bakhshoodegi ########
@@ -53,20 +54,33 @@ egen t_profit_ebrazi_by_activity = sum(profit_ebrazi)	, by(actyear T00_ActivityT
 egen t_profit_ghati_by_activity = sum(profit_ghati_cal)	, by(actyear T00_ActivityTypeName)
 egen t_tax_ebrazi_by_activity = sum(tax_ebrazi)			, by(actyear T00_ActivityTypeName)
 egen t_tax_ghati_by_activity = sum(tax_ghati)			, by(actyear T00_ActivityTypeName)
-egen count_by_activity = sum(!missing(trace_id))		, by(actyear T00_ActivityTypeName)
+egen count_by_activity = sum(!missing(etr_ghati_s))		, by(actyear T00_ActivityTypeName)
 
 gen etr_ebrazi_by_activity = t_tax_ebrazi_by_activity / t_profit_ebrazi_by_activity
 gen etr_ghati_by_activity  = t_tax_ghati_by_activity  / t_profit_ghati_by_activity
 
-egen t_lost_income_by_act = sum(lost_income_ebrazi2), by(actyear T00_ActivityTypeName)
+egen t_lost_income_by_act = sum(lost_income_ebrazi2)	, by(actyear T00_ActivityTypeName)
 
-
+************ percentile 100
 egen count_percentile100 = sum(percentile_g == 100)		, by(actyear T00_ActivityTypeName)
 egen t_profit_ghati_p100_by_activity = sum(profit_ghati_cal * (percentile_g == 100)) ///
 		, by(actyear T00_ActivityTypeName)
 egen t_tax_ghati_p100_by_activity = sum(tax_ghati * (percentile_g == 100)) ///
 		, by(actyear T00_ActivityTypeName)
+gen etr_ghati_p100_by_act = t_tax_ghati_p100_by_activity / t_profit_ghati_p100_by_activity
 egen t_lost_income_by_act_p100 = sum(lost_income_ebrazi2 * (percentile_g == 100)), by(actyear T00_ActivityTypeName)
+
+
+
+*********** zero ETR
+egen count_ZeroETR = sum(etr_ghati_s <= 0.01)			, by(actyear T00_ActivityTypeName)
+egen t_profit_ghati_ZETR_by_activity = sum(profit_ghati_cal * (etr_ghati_s <= 0.01)) ///
+		, by(actyear T00_ActivityTypeName)
+egen t_tax_ghati_ZETR_by_activity = sum(tax_ghati * (etr_ghati_s <= 0.01)) ///
+		, by(actyear T00_ActivityTypeName)
+gen etr_ghati_ZETR_by_act = t_tax_ghati_ZETR_by_activity / t_profit_ghati_ZETR_by_activity
+egen t_lost_income_by_act_ZETR = sum(lost_income_ebrazi2 * (etr_ghati_s <= 0.01)), by(actyear T00_ActivityTypeName)
+
 
 
 
@@ -91,7 +105,17 @@ preserve
 		*/ count_percentile100 ///
 		t_profit_ghati_p100_by_activity ///
 		t_tax_ghati_p100_by_activity ///
-		t_lost_income_by_act_p100
+		etr_ghati_p100_by_act ///
+		t_lost_income_by_act_p100 /*
+		
+		Zero Rate ETR
+		
+		*/ count_ZeroETR ///
+		t_profit_ghati_ZETR_by_activity ///
+		t_tax_ghati_ZETR_by_activity ///
+		etr_ghati_ZETR_by_act /// 
+		t_lost_income_by_act_ZETR
+		
 
 	duplicates drop
 	export excel "Corp by ActivityType.xlsx", firstrow(varl) replace
