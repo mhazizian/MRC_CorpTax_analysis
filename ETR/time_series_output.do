@@ -20,7 +20,7 @@ gen etr_ebrazi_agr_yearly = sum_tax_ebrazi_yearly / total_profit_ebrazi
 gen etr_ghati_agr_yearly  = sum_tax_ghati_yearly / total_profit_ghati
 
 egen sum_lost_income_ebrazi = sum(lost_income_ebrazi2), by(actyear)
-
+egen sum_tax_ghati 			= sum(tax_ghati)		  , by(actyear)
 
 local percent 0.01 
 display "###########  corporate with etr_ebrazi < `percent' ########"
@@ -46,7 +46,8 @@ preserve
 	keep actyear ///
 		etr_ebrazi_agr_yearly ///
 		etr_ghati_agr_yearly ///
-		sum_lost_income_ebrazi /*
+		sum_lost_income_ebrazi ///
+		sum_tax_ghati /*
 		
 		less than 1 percent rate:
 		
