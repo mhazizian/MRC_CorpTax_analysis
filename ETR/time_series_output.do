@@ -25,8 +25,8 @@ egen sum_tax_ghati 			= sum(tax_ghati)		  , by(actyear)
 local percent 0.01 
 display "###########  corporate with etr_ebrazi < `percent' ########"
 
-egen lp_sum_lost_income_ebrazi	 = sum( lost_income_ebrazi2 * (etr_ebrazi < `percent')), by(actyear)
-egen lp_sum_lost_income_ebrazi_g = sum( lost_income_ebrazi2 * (etr_ghati_s < `percent')), by(actyear)
+egen lp_sum_lost_income_ebrazi	 = sum( lost_income_ebrazi2 * (etr_ebrazi <= `percent')), by(actyear)
+egen lp_sum_lost_income_ebrazi_g = sum( lost_income_ebrazi2 * (etr_ghati_s <= `percent')), by(actyear)
 
 egen percent_of_lp_ebrazi   = mean(etr_ebrazi  <= `percent'), by(actyear)
 egen percent_of_lp_ghati    = mean(etr_ghati_s <= `percent'), by(actyear)
