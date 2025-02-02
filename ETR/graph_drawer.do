@@ -91,12 +91,25 @@ frame change graph_frame
 		legend(order(1 "سود محاسبه شده" 2 "سود ابرازی") pos(6) rows(1)) ///
 		yscale(log) yla(`yla', ang(h)) ///
 		ylab(, grid) xlab(, grid) ///
+		title(متوسط سود ویژه ابرازی صدک‌ها -‍ سال $year, size(large‍‍)) ///
 		ytitle(متوسط سود ویژه شرکت, size(medium)) ///
 		xtitle(صدک شرکت, size(medium)) ///
-		title(متوسط سود ویژه ابرازی صدک‌ها -‍ سال $year, size(large‍‍)) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
 	graph export C00_$year.png, as(png) replace	
 
+	
+	niceloglabels avg_profit_g_percentile if !missing(percentile_g), local(yla) style(1) powers
+	line avg_profit_g_percentile percentile_g if !missing(percentile_g), sort  ///
+		legend(order(1 "سود محاسبه شده" 2 "سود ابرازی") pos(6) rows(1)) ///
+		yscale(log) yla(`yla', ang(h)) ///
+		ylab(, grid) xlab(, grid) ///
+		title(متوسط سود ویژه ابرازی صدک‌ها -‍ سال $year, size(large)) ///
+		ytitle(متوسط سود ویژه شرکت, size(medium)) ///
+		xtitle(صدک شرکت, size(medium)) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	graph export C001_$year.png, as(png) replace	
+
+	
 	
 // 	twoway ///		
 // 		( line low_rate_percent_ghati_s percentile_g	, sort ) ///
@@ -154,7 +167,7 @@ frame change graph_frame_g
 	graph pie, ///
 		over(etr_tag) ///
 		by(seg, rows(1) ///
-			title("توزیع نرخ موثر قطعی شرکت در صدک های مختلف", size(large)) note("")) ///
+			title("توزیع نرخ موثر قطعی شرکت در صدک های مختلف - سال$year", size(large)) note("")) ///
 		subtitle(, alignment(middle)) ///
 		plabel(_all percent, format(%2.0f) color(black) gap(-12)) ///
 		line(lcolor(black) lwidth(0.2)) ///
@@ -181,7 +194,7 @@ frame change graph_frame_g
 	
 	graph pie profit_ghati_cal, ///
 		over(is_p100) ///
-		title(توزیع مجموع سود ویژه محاسبه شده شرکت‌ها - سال $year, size(large)) ///
+		title(توزیع مجموع سود قبل از مالیات محاسبه شده شرکت‌ها - سال $year, size(large)) ///
 		subtitle(, alignment(middle)) ///
 		plabel(_all percent, format(%2.0f) color(black) gap(-5)) ///
 		plabel(_all name) ///
@@ -191,6 +204,8 @@ frame change graph_frame_g
 		pie(2, color(71  179 156)) ///
 		name(CG14_$year, replace)
 	graph export CG14_$year.png, as(png) replace
+	
+	
 	
 	graph pie lost_income_ebrazi2, ///
 		over(is_p100) ///
