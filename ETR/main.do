@@ -82,6 +82,18 @@ gen etr_ghati_ZETR_by_act = t_tax_ghati_ZETR_by_activity / t_profit_ghati_ZETR_b
 egen t_lost_income_by_act_ZETR = sum(lost_income_ebrazi2 * (etr_ghati_s <= 0.01)), by(actyear T00_ActivityTypeName)
 
 
+*********** zero ETR & percentile 100
+egen count_ZeroETRP100 = sum(etr_ghati_s <= 0.01 & percentile_g == 100)			, by(actyear T00_ActivityTypeName)
+egen t_profit_ghati_ZETRP100_by_act = sum(profit_ghati_cal * (etr_ghati_s <= 0.01 & percentile_g == 100)) ///
+		, by(actyear T00_ActivityTypeName)
+		
+egen t_tax_ghati_ZETRP100_by_act = sum(tax_ghati * (etr_ghati_s <= 0.01 & percentile_g == 100)) ///
+		, by(actyear T00_ActivityTypeName)
+		
+gen etr_ghati_ZETRP100_by_act = t_tax_ghati_ZETRP100_by_act / t_profit_ghati_ZETRP100_by_act
+egen t_lost_income_by_act_ZETRP100 = sum(lost_income_ebrazi2 * (etr_ghati_s <= 0.01 & percentile_g == 100)), by(actyear T00_ActivityTypeName)
+
+
 
 
 
@@ -114,7 +126,15 @@ preserve
 		t_profit_ghati_ZETR_by_activity ///
 		t_tax_ghati_ZETR_by_activity ///
 		etr_ghati_ZETR_by_act /// 
-		t_lost_income_by_act_ZETR
+		t_lost_income_by_act_ZETR /*
+		
+		Zero Rate ETR & percentile 100
+		
+		*/ count_ZeroETRP100 ///
+		t_profit_ghati_ZETRP100_by_act ///
+		t_tax_ghati_ZETRP100_by_act ///
+		etr_ghati_ZETRP100_by_act /// 
+		t_lost_income_by_act_ZETRP100
 		
 
 	duplicates drop
@@ -122,6 +142,10 @@ preserve
 restore
 	 
 	 
+//
+//
+//
+//
 //
 //
 //
