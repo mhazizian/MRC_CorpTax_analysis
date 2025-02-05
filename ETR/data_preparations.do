@@ -304,7 +304,7 @@ drop flag
 // egen percentile_g = xtile(profit_ghati_cal) , by(actyear) nq(100)
 astile percentile 	= profit_ebrazi		if profit_ebrazi > 0	, nq(100) by(actyear)
 astile percentile_g = profit_ghati_cal	if profit_ghati_cal > 0 , nq(100) by(actyear)
-astile p100_decile = profit_ghati_cal	if percentile_g == 100  , nq(10) by(actyear)
+astile p100_decile  = profit_ghati_cal	if percentile_g == 100  , nq(10) by(actyear)
 
 
 replace profit_ghati_cal = -1 if missing(profit_ghati_cal)	
@@ -321,6 +321,9 @@ egen avg_profit_g_percentile = mean(profit_ghati_cal)	, by(actyear percentile_g)
 
 egen sum_profit_percentile   = sum(profit_ebrazi), by(actyear percentile_g)
 egen sum_profit_g_percentile = sum(profit_ghati_cal), by(actyear percentile_g)
+egen sum_tax_g_percentile		 = sum(tax_ghati)			, by(actyear percentile_g)
+egen sum_lost_income_percentile  = sum(lost_income_ebrazi2)	, by(actyear percentile_g)
+
 
 egen sum_profit_g_prct_zero_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.01)) , by(actyear percentile_g)
 egen sum_profit_g_prct_low_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.1)) , by(actyear percentile_g)
