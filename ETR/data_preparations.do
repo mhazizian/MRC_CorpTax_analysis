@@ -190,7 +190,12 @@ replace profit_ghati_cal = profit_ghati_cal + T26_R06 if !missing(T26_R06)			// 
 ********  Moafiat *******
 replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// Moafiat
 // replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_moafiat) 	// Moafiat
-// replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_maghtou) 	// Maliat Maghtou
+// replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_maghtou) 		// Maliat Maghtou
+
+// @@@ MRC Version
+if $is_sharif_version == 0 {
+	replace profit_ghati_cal = profit_ghati_cal + maghtou_taxable_income if !missing(maghtou_taxable_income) 	// Maliat Maghtou for 1401
+}
 
 
 replace profit_ghati_cal = profit_ghati_cal + T26_004 if !missing(T26_004) 			// Maliat Maghtou
@@ -391,9 +396,4 @@ label define etr_tag_label ///
 	3 "از ۱۰ تا ۲۰ درصد" ///
 	4 "از ۲۰ تا ۲۵ درصد"
 label values etr_tag etr_tag_label
-
-// Lost Income:
-egen sum_lost_income_percentile = sum(lost_income_ebrazi2), by(actyear percentile_g)
-// gen tax_exp_to_profit_eb = avg_lost_income_percentile_eb / avg_profit_percentile
-// egen tax_exp_to_profit_eb = mean(lost_income_ebrazi2 / profit_ebrazi), by(actyear percentile)
 
