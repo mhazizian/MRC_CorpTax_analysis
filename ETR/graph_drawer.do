@@ -1,6 +1,8 @@
 frame change default
 graph drop _all
 
+graph set svg fontface "B Nazanin"
+
 
 frame copy default graph_frame, replace
 frame change graph_frame
@@ -162,7 +164,6 @@ frame change graph_frame_g
 		2 "صدک ۹۰ تا ۹۹" ///
 		1 "صدک ۱ تا ۹۰"
 	label values seg seg_label
-	
 
 	graph pie, ///
 		over(etr_tag) ///
@@ -179,9 +180,9 @@ frame change graph_frame_g
 		pie(4, color(71  179 156)) ///
 		name(CG13_$year, replace)
 	graph export CG13_$year.png, as(png) replace
+
 	
-	
-	
+	*********************
 	
 	gen is_p100 = .
 	replace is_p100 = (percentile_g == 100)
@@ -194,7 +195,7 @@ frame change graph_frame_g
 	
 	graph pie profit_ghati_cal, ///
 		over(is_p100) ///
-		title(توزیع مجموع سود قبل از مالیات محاسبه شده شرکت‌ها - سال $year, size(large)) ///
+		title(مجموع سود قبل از مالیات کت‌ها, size(large)) ///
 		subtitle(, alignment(middle)) ///
 		plabel(_all percent, format(%2.0f) color(black) gap(-5)) ///
 		plabel(_all name) ///
@@ -205,11 +206,22 @@ frame change graph_frame_g
 		name(CG14_$year, replace)
 	graph export CG14_$year.png, as(png) replace
 	
-	
+	graph pie tax_ghati, ///
+		over(is_p100) ///
+		title(مجموع مالیات قطعی شرکت, size(large)) ///
+		subtitle(, alignment(middle)) ///
+		plabel(_all percent, format(%2.0f) color(black) gap(-5)) ///
+		plabel(_all name) ///
+		line(lcolor(black) lwidth(0.2)) ///
+		legend(off) ///
+		pie(1, explode color(236 107 86)) ///
+		pie(2, color(71  179 156)) ///
+		name(CG141_$year, replace)
+	graph export CG141_$year.png, as(png) replace
 	
 	graph pie lost_income_ebrazi2, ///
 		over(is_p100) ///
-		title(توزیع مخارج مالیاتی دولت در صدک‌ها - سال $year, size(large)) ///
+		title(مجموع مخارج مالیاتی دولت, size(large)) ///
 		subtitle(, alignment(middle)) ///
 		plabel(_all percent, format(%2.0f) color(black) gap(-5)) ///
 		plabel(_all name) ///
@@ -220,7 +232,82 @@ frame change graph_frame_g
 		name(CG15_$year, replace)
 	graph export CG15_$year.png, as(png) replace
 	
+	graph combine CG14_$year CG141_$year CG15_$year, name(CG14_C_$year, replace) ///
+		title(مقایسه صدک ۱۰۰ ام با سایر صدک‌ها - سال $year, size(large)) ///
+		subtitle("   ") ///
+		row(1)
+	graph export CG14_C_$year.png, as(png) replace
 	
+	********************
+	
+	gen li_share = sum_lost_income_percentile / (sum_tax_g_percentile + sum_lost_income_percentile) * 100
+	gen total_share = 100
+
+	twoway ///
+		(area  li_share 				percentile_g, color("236 107 86"))  || ///
+		(rarea li_share total_share 	percentile_g, color("71  179 156")), ///
+		legend(order(1 "درآمد از دست رفته دولت" 2 "مالیات قطعی") pos(6) row(1)) ///
+		ylab(, grid) xlab(, grid) ///
+		xtitle(صدک شرکت, size(medium)) ///
+		title(مقایسه نسبت مجموع مالیات قطعی و مخارج مالیاتی در هر صدک -‍ سال $year‍‍, size(large)) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5) range(0 1))
+	graph export CG15_A_$year.png, as(png) replace
+	
+	label variable tax_ghati "مالیات شرکت"
+	label variable lost_income_ebrazi2 "درآمد از دست رفته از محل معافیت و بخشودگی‌ها"
+	
+	graph pie tax_ghati lost_income_ebrazi2, ///
+		by(seg, rows(1) ///
+			title("مقایسه نسبت مالیات و مخارج مالیاتی در صدک های مختلف - سال$year", size(large)) note("")) ///
+		subtitle(, alignment(middle)) ///
+		plabel(_all percent, format(%2.0f) color(black) gap(-12)) ///
+		line(lcolor(black) lwidth(0.2)) ///
+		graphregion(color(white)) ///
+		legend(rows(1) symxsize(*1.5) size(*1.2) ring(0)) ///
+		pie(2, explode color(236 107 86)) ///
+		pie(1, color(71  179 156)) ///
+		name(CG15_P_$year, replace)
+	graph export CG15_P_$year.png, as(png) replace
+	
+	*********************
+
+	
+	
+	
+	
+	label define istop200_label ///
+		1 "دویست  شرکت پر سود" ///
+		0 "سایر شرکت‌ها"
+	label values top200 istop200_label
+	
+	graph pie lost_income_ebrazi2, ///
+		over(top200) ///
+		title(توزیع مخارج مالیاتی دولت - سال $year, size(large)) ///
+		subtitle(, alignment(middle)) ///
+		plabel(_all percent, format(%2.0f) color(black) gap(-5)) ///
+		plabel(_all name) ///
+		line(lcolor(black) lwidth(0.2)) ///
+		legend(off) ///
+		pie(1, explode color(236 107 86)) ///
+		pie(2, color(71  179 156)) ///
+		name(CG17_$year, replace)
+	graph export CG17_$year.png, as(png) replace
+	
+	graph pie profit_ghati_cal, ///
+		over(top200) ///
+		title(توزیع مجموع سود ویژه محاسبه شده شرکت‌ها - سال $year, size(large)) ///
+		subtitle(, alignment(middle)) ///
+		plabel(_all percent, format(%2.0f) color(black) gap(-5)) ///
+		plabel(_all name) ///
+		line(lcolor(black) lwidth(0.2)) ///
+		legend(off) ///
+		pie(1, explode color(236 107 86)) ///
+		pie(2, color(71  179 156)) ///
+		name(CG171_$year, replace)
+	graph export CG171_$year.png, as(png) replace
+	
+	graph combine CG171_$year CG17_$year, name(CG17_C_$year, replace)
+	graph export CG17_C_$year.png, as(png) replace
 	
 	
 	gen istop200_inp100 = .
@@ -228,8 +315,8 @@ frame change graph_frame_g
 	replace istop200_inp100 = 1 if (top200 == 1)
 	
 	label define istop200_inp100_label ///
-		1 "۲۰۰ شرکت پر سود" ///
-		0 "سایر شرکت‌های صدک ۱۰۰ ام'"
+		1 "دویست  شرکت پر سود" ///
+		0 "سایر شرکت‌های صدک ۱۰۰ ام"
 	label values istop200_inp100 istop200_inp100_label
 	
 	graph pie profit_ghati_cal, ///

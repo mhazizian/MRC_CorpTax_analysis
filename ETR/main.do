@@ -8,7 +8,7 @@
 set scheme cleanplots, perm
 
 
-clear
+clear all
 frame reset
 graph set window fontface "B Nazanin"
 graph drop _all
