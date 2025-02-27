@@ -349,12 +349,16 @@ frame change graph_frame_g
 		xscale(titlegap(2.5)) yscale(titlegap(1.5) range(0 1))
 	graph export CG10_$year.png, as(png) replace
 	
-		
-	line avg_etr_ghati_percentile percentile_g, sort name(CG09_$year, replace) ///
+	preserve
+	keep avg_etr_ghati_percentile percentile_g
+	duplicates drop
+	graph twoway scatter avg_etr_ghati_percentile percentile_g, m(smplus) mc(gray) || lowess avg_etr_ghati_percentile percentile_g , sort bwidth(0.15) name(CG09_$year, replace) ///
 		ytitle(متوسط نرخ مالیات قطعی شرکت, size(medium)) ///
 		xtitle(صدک شرکت, size(medium)) ///
 		title(متوسط نرخ موثر مالیاتی قطعی در هر صدک -‍ سال $year‍‍, size(large)) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(cranberry)
+		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(cranberry) ///
+		legend(off)
+	restore
 	graph export CG09_$year.png, as(png) replace
 
 
