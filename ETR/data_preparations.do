@@ -192,16 +192,30 @@ replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// 
 // replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_moafiat) 	// Moafiat
 // replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_maghtou) 		// Maliat Maghtou
 
+
 // @@@ MRC Version
 if $is_sharif_version == 0 {
-	replace profit_ghati_cal = profit_ghati_cal + maghtou_taxable_income if !missing(maghtou_taxable_income) 	// Maliat Maghtou for 1401
+    // Maliat Maghtou for 1401
+	// for years before 1401, maliat maghtoo in integrated into Moafiat(T26_R04)
+	replace profit_ghati_cal = profit_ghati_cal + maghtou_taxable_income if !missing(maghtou_taxable_income) 	
 }
 
 
 replace profit_ghati_cal = profit_ghati_cal + T26_004 if !missing(T26_004) 			// Maliat Maghtou
 replace profit_ghati_cal = profit_ghati_cal - T26_R02 if !missing(T26_R02) 			// going for Sood Vije
 replace profit_ghati_cal = profit_ghati_cal - T26_R03 if !missing(T26_R03) 			// going for Sood Vije
-replace profit_ghati_cal = profit_ghati_cal - T26_R08 if !missing(T26_R08) 			// Zian Gheir Moaf
+
+// Mr.Ghaffarzade: this value is not used while calculating corporate tax.
+// replace profit_ghati_cal = profit_ghati_cal - T26_R08 if !missing(T26_R08) 		// Zian Gheir Moaf (T26_R08 is negetive)
+
+if T26_R04 > T26_R01 & !missing(T26_R04) & tax_ghati == 0 {
+    // for corporations which their non-exempt activities are experiencing loss and INTA accepted this
+	// it these cases, since tax_ghati wouldn't get negetive, the calculattion won't work.
+	// Zian Gheir Moaf (T26_R08 is negetive)
+    replace profit_ghati_cal = profit_ghati_cal + T26_R08 if !missing(T26_R08) 		
+}
+
+
 
 replace profit_ghati_cal = . if missing(tax_ghati)
 replace profit_ghati_cal = 0 if profit_ghati_cal < 0

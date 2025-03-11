@@ -28,6 +28,9 @@ frame change graph_frame_g
 	replace middle_rate_percent_ghati_s = middle_rate_percent_ghati_s * 100
 	replace high_rate_percent_ghati_s = high_rate_percent_ghati_s * 100
 
+// ############################################################################
+// ############################################################################
+// ############################################################################
 
 
 frame change graph_frame
@@ -67,23 +70,34 @@ frame change graph_frame
 		xtitle(تعداد شرکت, size(medium)) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
 	graph export "./out/LI0_$year.png", as(png) replace
-
-// 	niceloglabels avg_profit_percentile , local(yla) style(1) powers
-// 	line avg_profit_percentile percentile , ///
-// 		sort yscale(log) yla(`yla', ang(h)) ///
-// 		ytitle(متوسط سود ویژه شرکت) xtitle(صدک شرکت) ///
-// 		title(متوسط سود ویژه ابرازی صدک‌ها -‍ $year‍‍) ///
-// 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-// 	graph export decile_profit_$year.png, as(png) replace
-
 	
-// 	niceloglabels avg_profit_g_percentile , local(yla) style(1) powers
-// 	line avg_profit_g_percentile percentile_g , ///
-// 		sort yscale(log) yla(`yla', ang(h)) ///
-// 		ytitle(متوسط سود ویژه شرکت) xtitle(صدک شرکت) ///
-// 		title(متوسط سود ویژه ابرازی صدک‌ها -‍ $year‍‍) ///
-// 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-// 	graph export decile_profit_g_$year.png, as(png) replace
+	
+	gsort -profit_ghati_cal
+	gen idx_pg = _n
+	cumul idx_pg [w=int(profit_ghati_cal)], gen(profit_ghati_cal_cumul)
+	replace profit_ghati_cal_cumul = profit_ghati_cal_cumul * 100
+	gsort -profit_ghati_cal_cumul
+	line profit_ghati_cal_cumul idx_pg if idx_pg < 100, ///
+		title(سهم تجمعی شرکت‌های بزرگ از کل سود قبل از مالیات- سال $year, size(large)) ///
+		ytitle(درصد از کل سود قبل از مالیات محاسبه شده, size(medium)) ///
+		xtitle(تعداد شرکت, size(medium)) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
+		name(ProfitC0_$year, replace)
+	graph export "./out/PD0_$year.png", as(png) replace
+	
+	
+	gsort -profit_ebrazi
+	gen idx_pe = _n
+	cumul idx_pe [w=int(profit_ebrazi)], gen(profit_ebrazi_cumul)
+	replace profit_ebrazi_cumul = profit_ebrazi_cumul * 100
+	gsort -profit_ebrazi_cumul
+	line profit_ebrazi_cumul idx_pe if idx_pe < 100, ///
+		title(سهم تجمعی شرکت‌های بزرگ از کل سود قبل از مالیات- سال $year, size(large)) ///
+		ytitle(درصد از کل سود قبل از مالیات ابرازی, size(medium)) ///
+		xtitle(تعداد شرکت, size(medium)) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
+		name(ProfitC1_$year, replace)
+	graph export "./out/PD1_$year.png", as(png) replace
 	
 	
 	niceloglabels avg_profit_g_percentile if !missing(percentile_g), local(yla) style(1) powers
@@ -110,36 +124,13 @@ frame change graph_frame
 		xtitle(صدک شرکت, size(medium)) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
 	graph export "./out/C001_$year.png", as(png) replace	
-
-	
-	
-// 	twoway ///		
-// 		( line low_rate_percent_ghati_s percentile_g	, sort ) ///
-// 		( line low_rate_percent_ebrazi  percentile_g		, sort ), ///
-// 		legend(order(1 "نرخ موثر قطعی" 2 "نرخ موثر ابرازی") pos(6) rows(1)) ///
-// 		ylab(, grid) xlab(, grid) ///
-// 		title(توزیع شرکت‌های با نرخ موثر قطعی کمتر از ۵ درصد در صدک‌ها -‍ $year‍‍) ///
-// 		ytitle(درصد شرکت با نرخ موثر کمتر از ۵ درصد) xtitle(صدک شرکت) ///
-// 		xscale(titlegap(2.5)) yscale(titlegap(1.5)) 
-// 	graph export C03_$year.png, as(png) replace
-	
-
-// 	twoway ///		
-// 		( line zero_rate_percent_ghati_s percentile_g	, sort ) ///
-// 		( line zero_rate_percent_ebrazi  percentile_g	, sort ), ///
-// 		legend(order(1 "نرخ موثر قطعی" 2 "نرخ موثر ابرازی") pos(6) rows(1)) ///
-// 		ylab(, grid) xlab(, grid) ///
-// 		title(توزیع شرکت‌های با نرخ موثر قطعی کمتر از ۱ درصد در صدک‌ها -‍ $year‍‍) ///
-// 		ytitle(درصد شرکت با نرخ موثر کمتر از ۱ درصد) xtitle(صدک شرکت) ///
-// 		xscale(titlegap(2.5)) yscale(titlegap(1.5)) 
-// 	graph export C04_$year.png, as(png) replace
-	
 	
 	
 
-	
+// ############################################################################
+// ############################################################################
+// ############################################################################
 
-// ##############
 
 // 		pie(4, color(dkgreen)) ///
 // 		pie(1, color(cranberry)) ///
@@ -168,7 +159,7 @@ frame change graph_frame_g
 	graph pie, ///
 		over(etr_tag) ///
 		by(seg, rows(1) ///
-			title("توزیع نرخ موثر قطعی شرکت در صدک های مختلف - سال$year", size(large)) note("")) ///
+			title("توزیع نرخ موثر مالیاتی شرکت‌ها در صدک های مختلف - سال$year", size(large)) note("")) ///
 		subtitle(, alignment(middle)) ///
 		plabel(_all percent, format(%2.0f) color(black) gap(-12)) ///
 		line(lcolor(black) lwidth(0.2)) ///
@@ -195,7 +186,21 @@ frame change graph_frame_g
 	
 	graph pie profit_ghati_cal, ///
 		over(is_p100) ///
-		title(مجموع سود قبل از مالیات کت‌ها, size(large)) ///
+		title(توزیع مجموع سود قبل از مالیات محاسبه شده شرکت‌ها - سال $year, size(large)) ///
+		subtitle(, alignment(middle)) ///
+		plabel(_all percent, format(%2.0f) color(black) gap(-5)) ///
+		plabel(_all name) ///
+		line(lcolor(black) lwidth(0.2)) ///
+		legend(off) ///
+		pie(1, explode color(236 107 86)) ///
+		pie(2, color(71  179 156)) ///
+		graphregion(margin(t=5)) ///
+		name(CG14_$year, replace)
+	graph export "./out/CG14_$year.png", as(png) replace
+	
+	graph pie profit_ghati_cal, ///
+		over(is_p100) ///
+		title(مجموع سود قبل از مالیات شرکت‌ها, size(large)) ///
 		subtitle(, alignment(middle)) ///
 		plabel(_all percent, format(%2.0f) color(black) gap(-5)) ///
 		plabel(_all name) ///
@@ -204,7 +209,7 @@ frame change graph_frame_g
 		pie(1, explode color(236 107 86)) ///
 		pie(2, color(71  179 156)) ///
 		name(CG14_$year, replace)
-	graph export "./out/CG14_$year.png", as(png) replace
+// 	graph export "./out/CG14_$year.png", as(png) replace
 	
 	graph pie tax_ghati, ///
 		over(is_p100) ///
@@ -254,7 +259,7 @@ frame change graph_frame_g
 	graph export "./out/CG15_A_$year.png", as(png) replace
 	
 	label variable tax_ghati "مالیات شرکت"
-	label variable lost_income_ebrazi2 "درآمد از دست رفته از محل معافیت و بخشودگی‌ها"
+	label variable lost_income_ebrazi2 "درآمد از دست رفته از محل معافیت‌ها و بخشودگی‌ها"
 	
 	graph pie tax_ghati lost_income_ebrazi2, ///
 		by(seg, rows(1) ///
@@ -270,10 +275,6 @@ frame change graph_frame_g
 	graph export "./out/CG15_P_$year.png", as(png) replace
 	
 	*********************
-
-	
-	
-	
 	
 	label define istop200_label ///
 		1 "دویست  شرکت پر سود" ///
@@ -345,19 +346,21 @@ frame change graph_frame_g
 		ylab(, grid) xlab(, grid) ///
 		ytitle(درصد از شرکت‌های هر صدک, size(medium)) ///
 		xtitle(صدک شرکت, size(medium)) ///
-		title(توزیع نرخ موثر مالیات قطعی شرکت در هر صدک -‍ سال $year‍‍, size(large)) ///
+		title(توزیع نرخ موثر مالیات شرکت‌ها در هر صدک -‍ سال $year‍‍, size(large)) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5) range(0 1))
 	graph export "./out/CG10_$year.png", as(png) replace
 	
 	preserve
 	keep avg_etr_ghati_percentile percentile_g
 	duplicates drop
-	graph twoway scatter avg_etr_ghati_percentile percentile_g, m(smplus) mc(gray) || lowess avg_etr_ghati_percentile percentile_g , sort bwidth(0.15) name(CG09_$year, replace) ///
-		ytitle(متوسط نرخ مالیات قطعی شرکت, size(medium)) ///
-		xtitle(صدک شرکت, size(medium)) ///
-		title(متوسط نرخ موثر مالیاتی قطعی در هر صدک -‍ سال $year‍‍, size(large)) ///
-		xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(cranberry) ///
-		legend(off)
+	graph twoway ///
+		scatter avg_etr_ghati_percentile percentile_g, m(smplus) mc(gray) || ///
+		lowess avg_etr_ghati_percentile percentile_g , sort bwidth(0.15) name(CG09_$year, replace) ///
+			ytitle(متوسط نرخ موثر مالیات قطعی شرکت, size(medium)) ///
+			xtitle(صدک شرکت, size(medium)) ///
+			title(متوسط نرخ موثر مالیاتی در هر صدک -‍ سال $year‍‍, size(large)) ///
+			xscale(titlegap(2.5)) yscale(titlegap(1.5)) color(cranberry) ///
+			legend(off)
 	restore
 	graph export "./out/CG09_$year.png", as(png) replace
 
@@ -382,25 +385,28 @@ frame change graph_frame_g
 	graph combine CG01_$year CG03_$year
 	
 	
-	
-	
-	
 		
 	hist etr_ghati2 if top1000 == 1, percent bin(26) ///
-		title(توزیع نرخ مالیات موثر قطعی ۱۰۰۰ شرکت پرسود -‍ $year ) ///
-		ytitle(درصد) xtitle(نرخ موثر مالیات قطعی) color(green%60) ///
+		title(توزیع نرخ مالیات موثر قطعی ۱۰۰۰ شرکت پرسود -‍ $year, size(large)) ///
+		ytitle(درصد, size(medium)) ///
+		xtitle(نرخ موثر مالیات قطعی, size(medium)) ///
+		color(green%60) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
 	graph export "./out/CG081_$year.png", as(png) replace
 	
 	hist etr_ghati2 if top500 == 1, percent bin(26) ///
-		title(توزیع نرخ مالیات موثر قطعی ۵۰۰ شرکت پرسود -‍ $year ) ///
-		ytitle(درصد) xtitle(نرخ موثر مالیات قطعی) color(green%60) ///
+		title(توزیع نرخ مالیات موثر قطعی ۵۰۰ شرکت پرسود -‍ $year, size(large)) ///
+		ytitle(درصد, size(medium)) ///
+		xtitle(نرخ موثر مالیات قطعی, size(medium)) ///
+		color(green%60) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
 	graph export "./out/CG082_$year.png", as(png) replace
 	
 	hist etr_ghati_s2 if top200 == 1, percent bin(25) ///
-		title(توزیع نرخ مالیات موثر قطعی ۲۰۰ شرکت پرسود -‍ $year ) ///
-		ytitle(درصد) xtitle(نرخ موثر مالیات قطعی) color(green%60) ///
+		title(توزیع نرخ مالیات موثر قطعی ۲۰۰ شرکت پرسود -‍ $year, size(large)) ///
+		ytitle(درصد, size(medium)) ///
+		xtitle(نرخ موثر مالیات قطعی, size(medium)) ///
+		color(green%60) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
 	graph export "./out/CG083_$year.png", as(png) replace
 	

@@ -58,7 +58,7 @@ preserve
 		
 	duplicates drop
 	gsort -agr_li_moafiat_all	
-	export excel "Moafiat_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
+	export excel "./out/Moafiat_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
 restore
 
 
@@ -121,7 +121,7 @@ preserve
 		
 	duplicates drop
 	gsort -agr_li_bakhshoodegi_all
-	export excel "Bakhshoodegi_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
+	export excel "./out/Bakhshoodegi_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
 restore
 
 frame change default

@@ -21,21 +21,15 @@ global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 
 
 
-
 do "ETR/data_preparations.do"
 
 save "corp_cleaned_data_isSharif$is_sharif_version.dta", replace
 use "corp_cleaned_data_isSharif$is_sharif_version.dta", clear
 
-// replace agr_moafiat = 0 if missing(agr_moafiat)
-// replace agr_bakhshoudegi = 0 if missing(agr_bakhshoudegi)
-// gen agr_m = agr_moafiat + agr_maghtou 
-// tabstat agr_moafiat agr_m T26_R04 agr_bakhshoudegi T26_R16, s(sum) by(actyear)
-
 
 // ####### Yearly Charts ##############
 
-global year 1400
+global year 1401
 do "ETR/graph_drawer.do"
 
 // ####### Time Series  ###############
@@ -48,8 +42,9 @@ do "ETR/moafiat-bakhshoodegi.do"
 
 // ###### Sector Analisys #############
 
-do "ETR/sector/analysis.do"
-
+if $is_sharif_version == 0 {
+	do "ETR/sector_analysis.do"
+}
 //
 //
 //
