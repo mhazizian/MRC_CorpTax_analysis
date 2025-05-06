@@ -117,8 +117,14 @@ if $is_sharif_version == 1 {
 egen agr_maghtou = sum(Exempted_Profit * (exemption_id == `maliat_maghtoo_code')), by(trace_id)
 drop if exemption_id == `maliat_maghtoo_code'
 
+gen is_tolidi_temp = 0
+replace is_tolidi_temp = 1 if exemption_id == 2
+replace is_tolidi_temp = 1 if exemption_id == 13
+egen is_tolidi_m = max(is_tolidi_temp), by(trace_id)
+
 egen agr_moafiat = sum(Exempted_Profit), by(trace_id)
-keep trace_id agr_moafiat agr_maghtou
+
+keep trace_id agr_moafiat agr_maghtou is_tolidi_m
 duplicates drop
 
 frame change default
@@ -126,6 +132,8 @@ frlink 1:1 trace_id, frame(Moafiat_frame)
 
 frget agr_moafiat, from(Moafiat_frame)
 frget agr_maghtou, from(Moafiat_frame)
+frget is_tolidi_m, from(Moafiat_frame)
+
 frame drop Moafiat_frame
 drop Moafiat_frame
 
@@ -142,14 +150,21 @@ if $is_sharif_version == 1 {
 	egen trace_id = concat(actyear id), punct(_)
 }
 
+gen is_tolidi_temp = 0
+replace is_tolidi_temp = 1 if bakhshoodegi_id == 213
+replace is_tolidi_temp = 1 if bakhshoodegi_id == 214
+egen is_tolidi_b = max(is_tolidi_temp), by(trace_id)
 
 egen agr_bakhshoudegi = sum(Rebate_Amount), by(trace_id)
-keep trace_id agr_bakhshoudegi
+
+keep trace_id agr_bakhshoudegi is_tolidi_b
 duplicates drop
 
 frame change default
 frlink 1:1 trace_id, frame(Bakhshodegi_frame)
 frget agr_bakhshoudegi, from(Bakhshodegi_frame)
+frget is_tolidi_b, from(Bakhshodegi_frame)
+
 frame drop Bakhshodegi_frame
 drop Bakhshodegi_frame
 
@@ -196,21 +211,22 @@ replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// 
 // @@@ MRC Version
 if $is_sharif_version == 0 {
     // Maliat Maghtou for 1401
-	// for years before 1401, maliat maghtoo in integrated into Moafiat(T26_R04)
+	// for years before 1401, maliat maghtoo in integrated into Moafiat table(T26_R04)
 	replace profit_ghati_cal = profit_ghati_cal + maghtou_taxable_income if !missing(maghtou_taxable_income) 	
 }
 
 
 replace profit_ghati_cal = profit_ghati_cal + T26_004 if !missing(T26_004) 			// Maliat Maghtou
-replace profit_ghati_cal = profit_ghati_cal - T26_R02 if !missing(T26_R02) 			// going for Sood Vije
-replace profit_ghati_cal = profit_ghati_cal - T26_R03 if !missing(T26_R03) 			// going for Sood Vije
+replace profit_ghati_cal = profit_ghati_cal - T26_R02 if !missing(T26_R02) 			// going for Sood Vije!
+replace profit_ghati_cal = profit_ghati_cal - T26_R03 if !missing(T26_R03) 			// going for Sood Vije!
 
 // Mr.Ghaffarzade: this value is not used while calculating corporate tax.
 // replace profit_ghati_cal = profit_ghati_cal - T26_R08 if !missing(T26_R08) 		// Zian Gheir Moaf (T26_R08 is negetive)
 
 if T26_R04 > T26_R01 & !missing(T26_R04) & tax_ghati == 0 {
     // for corporations which their non-exempt activities are experiencing loss and INTA accepted this
-	// it these cases, since tax_ghati wouldn't get negetive, the calculattion won't work.
+	// in these cases, since tax_ghati wouldn't get negetive, the calculattion won't work. 
+	// actually we are accepting reported "earning before tax" from these corporations.
 	// Zian Gheir Moaf (T26_R08 is negetive)
     replace profit_ghati_cal = profit_ghati_cal + T26_R08 if !missing(T26_R08) 		
 }

@@ -119,7 +119,7 @@ frame change graph_frame
 		legend(order(1 "سود محاسبه شده" 2 "سود ابرازی") pos(6) rows(1)) ///
 		yscale(log) yla(`yla', ang(h)) ///
 		ylab(, grid) xlab(, grid) ///
-		title(متوسط سود قبل از مالیات ابرازی صدک‌ها -‍ سال $year, size(large)) ///
+		title(متوسط سود قبل از مالیات محاسبه‌شده هر صدک-‍ سال $year, size(large)) ///
 		ytitle(متوسط سود ویژه شرکت, size(medium)) ///
 		xtitle(صدک شرکت, size(medium)) ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5))

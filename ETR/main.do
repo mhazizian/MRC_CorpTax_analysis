@@ -4,6 +4,7 @@
 // ssc install astile
 // ssc install dataex
 // net install cleanplots, from("https://tdmize.github.io/data/cleanplots") replace
+// findit grc1leg // then install vwiggins version.
 // set scheme s2color, perm
 set scheme cleanplots, perm
 
@@ -16,6 +17,9 @@ graph drop _all
 
 global is_sharif_version 0
 global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+
+global geo_dir "~/Documents/Data/geo_data"
+
 // global dir "~\Documents\Majlis RC\data\tax_return\sharif"
 // global dir "D:\Data_Output\Hoghooghi"
 
@@ -23,18 +27,41 @@ global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 
 do "ETR/data_preparations.do"
 
-save "corp_cleaned_data_isSharif$is_sharif_version.dta", replace
-use "corp_cleaned_data_isSharif$is_sharif_version.dta", clear
+save "out_dta/corp_cleaned_data_isSharif$is_sharif_version.dta", replace
+use "out_dta/corp_cleaned_data_isSharif$is_sharif_version.dta", clear
 
 
 // ####### Yearly Charts ##############
 
-global year 1401
+global year 1400
 do "ETR/graph_drawer.do"
 
 // ####### Time Series  ###############
 
 do "ETR/time_series_output.do"
+
+
+// ############################################
+// ######### Exemption and Sector #############
+// ############################################
+
+// @ MRC data
+// Amend dataSet:
+
+do "Exemption&Sector/data_preparations-2.do"
+
+
+global year 1400
+do "Exemption&Sector/exemption_analysis.do"
+do "Exemption&Sector/bakhshoodegi_analysis.do"
+
+
+
+
+do "Exemption&Sector/graph_drawer2.do"
+
+
+
 
 // ####### Moafiat & Bakhshoodegi #####
 
@@ -45,6 +72,20 @@ do "ETR/moafiat-bakhshoodegi.do"
 if $is_sharif_version == 0 {
 	do "ETR/sector_analysis.do"
 }
+
+// ###### Geo Analisys #############
+
+if $is_sharif_version == 0 {
+	
+	do "Exemption&Sector/add_province_id.do"
+	
+	do "Exemption&Sector/sp_map.do"
+}
+
+
+
+
+
 //
 //
 //
