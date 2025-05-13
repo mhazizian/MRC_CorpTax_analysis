@@ -205,7 +205,10 @@ replace profit_ghati_cal = profit_ghati_cal + T26_R06 if !missing(T26_R06)			// 
 ********  Moafiat *******
 replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// Moafiat
 // replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_moafiat) 	// Moafiat
-// replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_maghtou) 		// Maliat Maghtou
+// replace profit_ghati_cal = profit_ghati_cal + agr_maghtou if !missing(agr_maghtou) 		// Maliat Maghtou
+
+
+
 
 
 // @@@ MRC Version
@@ -236,7 +239,10 @@ if T26_R04 > T26_R01 & !missing(T26_R04) & tax_ghati == 0 {
 replace profit_ghati_cal = . if missing(tax_ghati)
 replace profit_ghati_cal = 0 if profit_ghati_cal < 0
 
+// Robustness checke!
 // TODO: check this decision.
+// replace profit_ghati_cal = profit_ghati_cal - agr_maghtou if !missing(agr_maghtou) 		// Maliat Maghtou
+
 replace profit_ghati_cal = profit_ebrazi if profit_ghati_cal < profit_ebrazi ///
 	& !missing(profit_ebrazi)
 

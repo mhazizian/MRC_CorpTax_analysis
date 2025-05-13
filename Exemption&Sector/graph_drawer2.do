@@ -34,7 +34,7 @@ frame change graph_frame
 		color(green%60)	 ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 		name(E01_$year, replace)
-	graph export "./out/E001_$year.png", as(png) replace
+	graph export "$out_dir/E001_$year.png", as(png) replace
 	
 
 	hist etr_ghati_s2 if is_tolidi_b == 1 & actyear == 1400, ///
@@ -46,7 +46,7 @@ frame change graph_frame
 		color(green%60)	 ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 		name(E02_$year, replace)
-	graph export "./out/E002_$year.png", as(png) replace
+	graph export "$out_dir/E002_$year.png", as(png) replace
 
 	
 	hist etr_ghati_s2 if is_tolidi_b == 1 & actyear == 1400 & percentile_g == 100, ///
@@ -58,7 +58,7 @@ frame change graph_frame
 		color(green%60)	 ///
 		xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 		name(E03_$year, replace)
-	graph export "./out/E003_$year.png", as(png) replace
+	graph export "$out_dir/E003_$year.png", as(png) replace
 
 	
 

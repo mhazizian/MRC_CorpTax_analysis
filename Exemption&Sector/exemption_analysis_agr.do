@@ -100,7 +100,7 @@ graph pie Exempted_Profit ///
 	plabel(`exm_count' "سایر", gap(2)) ///
 	plabel(`exm_count' percent, format(%2.0f) color(black) gap(-12)) ///
 	name(P2_E_AGR_01_$year, replace)
-graph export "./out/P2_E_AGR_01_$year.png", as(png) replace
+graph export "$out_dir/P2_E_AGR_01_$year.png", as(png) replace
 
 
 egen count_others = sum(count * (order >= `exm_count'))
@@ -124,7 +124,7 @@ graph pie count ///
 	plabel(`exm_count' "سایر", gap(2)) ///
 	plabel(`exm_count' percent, format(%2.0f) color(black) gap(-12)) ///
 	name(P2_E_AGR_02_$year, replace)
-graph export "./out/P2_E_AGR_02_$year.png", as(png) replace
+graph export "$out_dir/P2_E_AGR_02_$year.png", as(png) replace
 
 
 grc1leg  P2_E_AGR_01_$year P2_E_AGR_02_$year

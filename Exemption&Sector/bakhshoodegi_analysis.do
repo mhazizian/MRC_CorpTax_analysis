@@ -54,7 +54,7 @@ foreach exm_desc_id in 3 5 13 9 14 {
 			color(red%60)	 ///
 			xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 			name(p2_B_`exm_desc_id'_01_$year, replace)
-		graph export "./out/P2_B_`exm_desc_id'_01_$year.png", as(png) replace
+		graph export "$out_dir/P2_B_`exm_desc_id'_01_$year.png", as(png) replace
 		
 
 		hist etr_ghati_s2, ///
@@ -67,7 +67,7 @@ foreach exm_desc_id in 3 5 13 9 14 {
 			color(green%60)	 ///
 			xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 			name(P2_B_`exm_desc_id'_02_$year, replace)
-		graph export "./out/P2_B_`exm_desc_id'_02_$year.png", as(png) replace
+		graph export "$out_dir/P2_B_`exm_desc_id'_02_$year.png", as(png) replace
 
 		
 		hist etr_ghati_s2 if percentile_g == 100, ///
@@ -80,7 +80,7 @@ foreach exm_desc_id in 3 5 13 9 14 {
 			color(green%60)	 ///
 			xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 			name(P2_B_`exm_desc_id'_03_$year, replace)
-		graph export "./out/P2_B_`exm_desc_id'_03_$year.png", as(png) replace
+		graph export "$out_dir/P2_B_`exm_desc_id'_03_$year.png", as(png) replace
 
 		
 		gsort -Rebate_Amount
@@ -96,7 +96,7 @@ foreach exm_desc_id in 3 5 13 9 14 {
 			xtitle(تعداد شرکت, size(medium)) ///
 			xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 			name(P2_B_`exm_desc_id'_04_$year, replace)
-		graph export "./out/P2_B_`exm_desc_id'_04_$year.png", as(png) replace
+		graph export "$out_dir/P2_B_`exm_desc_id'_04_$year.png", as(png) replace
 		
 	restore
 }

@@ -80,7 +80,7 @@ preserve
 		avg_etr_ebrazi_p100 ///
 		avg_etr_ghati_p100 
 	duplicates drop
-	export excel "./out/ETR_timeSeries_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
+	export excel "$out_dir/ETR_timeSeries_isSharif-$is_sharif_version.xlsx", firstrow(varl) replace
 restore
 
 

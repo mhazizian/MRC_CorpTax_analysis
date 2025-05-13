@@ -56,7 +56,7 @@ frame change sp_frame
 			osize(thin) ///
 		) ///
 	name(SP01_$year, replace)
-	graph export "./out/SP01_$year.png", as(png) replace
+	graph export "$out_dir/SP01_$year.png", as(png) replace
 	
 
 	
@@ -79,7 +79,7 @@ frame change sp_frame
 			osize(thin) ///
 		) ///
 	name(SP02_$year, replace)
-	graph export "./out/SP02_$year.png", as(png) replace
+	graph export "$out_dir/SP02_$year.png", as(png) replace
 	
 	
 	spmap zrate_count ///
@@ -101,7 +101,7 @@ frame change sp_frame
 			osize(thin) ///
 		) ///
 	name(SP03_$year, replace)
-	graph export "./out/SP03_$year.png", as(png) replace
+	graph export "$out_dir/SP03_$year.png", as(png) replace
 	
 
 	format zero_rate_percent %2.0f
@@ -124,7 +124,7 @@ frame change sp_frame
 			osize(thin) ///
 		) ///
 	name(SP031_$year, replace)
-	graph export "./out/SP031_$year.png", as(png) replace
+	graph export "$out_dir/SP031_$year.png", as(png) replace
 		
 	
 	spmap p100_zrate_count ///
@@ -146,7 +146,7 @@ frame change sp_frame
 			osize(thin) ///
 		) ///
 	name(SP04_$year, replace)
-	graph export "./out/SP04_$year.png", as(png) replace
+	graph export "$out_dir/SP04_$year.png", as(png) replace
 	
 	
 	
@@ -170,7 +170,7 @@ frame change sp_frame
 			osize(thin) ///
 		) ///
 	name(SP05_$year, replace)
-	graph export "./out/SP05_$year.png", as(png) replace
+	graph export "$out_dir/SP05_$year.png", as(png) replace
 	
 	
 	
@@ -194,7 +194,7 @@ frame change sp_frame
 			osize(thin) ///
 		) ///
 	name(SP06_$year, replace)
-	graph export "./out/SP06_$year.png", as(png) replace
+	graph export "$out_dir/SP06_$year.png", as(png) replace
 	
 	
 

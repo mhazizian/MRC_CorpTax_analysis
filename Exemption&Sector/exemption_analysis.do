@@ -46,7 +46,7 @@ label define temp 9 "درآمد حاصل از صادرات خدمات و کال�
 label values exemption_description temp
 
 // top20
-foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
+// foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 
 // all
 // foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 2 15 16 23 34 10 23 35 4 10 11 29 40 14 36 5 17 13 3 42 8 1 7 {
@@ -54,11 +54,14 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 // 132 - tax holiday
 // foreach exm_desc_id in 27 2 15 4 5 17 3 {
 
-	
+// knowledge base corporates
+foreach exm_desc_id in 22 40 {
+
+
 	frame copy Moafiat_frame Moafiat_frame_temp, replace
 	frame change Moafiat_frame_temp
 
-		local exm_desc_id 27
+// 		local exm_desc_id 27
 		keep if actyear == $year		
 		keep if exemption_description == `exm_desc_id'
 		drop if Exempted_Profit < 0
@@ -75,7 +78,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 			color(red%60)	 ///
 			xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 			name(P2_E_`exm_desc_id'_01_$year, replace)
-		graph export "./out/P2_E_`exm_desc_id'_01_$year.png", as(png) replace
+		graph export "$out_dir/P2_E_`exm_desc_id'_01_$year.png", as(png) replace
 		
 
 		hist etr_ghati_s2, ///
@@ -88,7 +91,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 			color(green%60)	 ///
 			xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 			name(P2_E_`exm_desc_id'_02_$year, replace)
-		graph export "./out/P2_E_`exm_desc_id'_02_$year.png", as(png) replace
+		graph export "$out_dir/P2_E_`exm_desc_id'_02_$year.png", as(png) replace
 
 		
 		hist etr_ghati_s2 if percentile_g == 100, ///
@@ -101,7 +104,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 			color(green%60)	 ///
 			xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 			name(P2_E_`exm_desc_id'_03_$year, replace)
-		graph export "./out/P2_E_`exm_desc_id'_03_$year.png", as(png) replace
+		graph export "$out_dir/P2_E_`exm_desc_id'_03_$year.png", as(png) replace
 
 		
 		gsort -Exempted_Profit
@@ -117,7 +120,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 			xtitle(تعداد شرکت, size(medium)) ///
 			xscale(titlegap(2.5)) yscale(titlegap(1.5)) ///
 			name(P2_E_`exm_desc_id'_04_$year, replace)
-		graph export "./out/P2_E_`exm_desc_id'_04_$year.png", as(png) replace
+		graph export "$out_dir/P2_E_`exm_desc_id'_04_$year.png", as(png) replace
 		
 		
 		preserve
@@ -143,7 +146,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 				plabel(`other_indx'  "سایر ( `other_count' شرکت)") ///
 				pie(`other_indx', color(gray%60)) ///
 				name(P2_E_`exm_desc_id'_041_$year, replace)
-			graph export "./out/P2_E_`exm_desc_id'_041_$year.png", as(png) replace
+			graph export "$out_dir/P2_E_`exm_desc_id'_041_$year.png", as(png) replace
 		restore
 		
 		
@@ -156,7 +159,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 			title(عمده نوع فعالیت مشمولین معافیت - سال $year, size(large)) ///
 			subtitle(`exm_des') ///
 			name(P2_E_`exm_desc_id'_05_$year, replace)
-		graph export "./out/P2_E_`exm_desc_id'_05_$year.png", as(png) replace
+		graph export "$out_dir/P2_E_`exm_desc_id'_05_$year.png", as(png) replace
 
 		
 // #################################### by Activity Type Name charts
@@ -204,7 +207,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 			plabel(`corp_count' "سایر", gap(2)) ///
 			plabel(`corp_count' percent, format(%2.0f) color(black) gap(-12)) ///
 			name(P2_E_`exm_desc_id'_06_$year, replace)
-		graph export "./out/P2_E_`exm_desc_id'_06_$year.png", as(png) replace
+		graph export "$out_dir/P2_E_`exm_desc_id'_06_$year.png", as(png) replace
 		
 		
 		local corp_count 9
@@ -233,7 +236,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 			plabel(`corp_count' "سایر", gap(2)) ///
 			plabel(`corp_count' percent, format(%2.0f) color(black) gap(-12)) ///
 			name(P2_E_`exm_desc_id'_07_$year, replace)
-		graph export "./out/P2_E_`exm_desc_id'_07_$year.png", as(png) replace
+		graph export "$out_dir/P2_E_`exm_desc_id'_07_$year.png", as(png) replace
 		
 		
 		graph bar (asis) count if order < 10, ///
@@ -244,7 +247,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 			ytitle(تعداد شرکت بهره‌مند از معافیت, size(medium)) ///
 			yscale(titlegap(1.5)) ///
 			name(P2_E_`exm_desc_id'_08_$year, replace)
-		graph export "./out/P2_E_`exm_desc_id'_08_$year.png", as(png) replace
+		graph export "$out_dir/P2_E_`exm_desc_id'_08_$year.png", as(png) replace
 		
 		
 		graph bar (asis) count_p100 if order_p100 < 10, ///
@@ -255,7 +258,7 @@ foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
 			ytitle(تعداد شرکت بهره‌مند از معافیت در صدک ۱۰۰ام, size(medium)) ///
 			yscale(titlegap(1.5)) ///
 			name(P2_E_`exm_desc_id'_09_$year, replace)
-		graph export "./out/P2_E_`exm_desc_id'_09_$year.png", as(png) replace
+		graph export "$out_dir/P2_E_`exm_desc_id'_09_$year.png", as(png) replace
 		
 		
 	frame change Moafiat_frame

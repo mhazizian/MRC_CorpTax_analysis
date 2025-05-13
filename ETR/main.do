@@ -17,6 +17,7 @@ graph drop _all
 
 global is_sharif_version 0
 global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+global out_dir "./out/no-maghtou"
 
 global geo_dir "~/Documents/Data/geo_data"
 
@@ -26,9 +27,10 @@ global geo_dir "~/Documents/Data/geo_data"
 
 
 do "ETR/data_preparations.do"
+do "./identify_corporates.do"
 
-save "out_dta/corp_cleaned_data_isSharif$is_sharif_version.dta", replace
-use "out_dta/corp_cleaned_data_isSharif$is_sharif_version.dta", clear
+save "$out_dir/dta/corp_cleaned_data_isSharif$is_sharif_version.dta", replace
+use "$out_dir/dta/corp_cleaned_data_isSharif$is_sharif_version.dta", clear
 
 
 // ####### Yearly Charts ##############

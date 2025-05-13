@@ -95,7 +95,7 @@ preserve
 		
 
 	duplicates drop
-	export excel "./out/Corp by ActivityType.xlsx", firstrow(varl) replace
+	export excel "$out_dir/Corp by ActivityType.xlsx", firstrow(varl) replace
 restore
 	 
 	 
