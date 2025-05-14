@@ -361,7 +361,7 @@ drop flag
 // egen percentile_g = xtile(profit_ghati_cal) , by(actyear) nq(100)
 astile percentile 	= profit_ebrazi		if profit_ebrazi > 0	, nq(100) by(actyear)
 astile percentile_g = profit_ghati_cal	if profit_ghati_cal > 0 , nq(100) by(actyear)
-astile percentile_g_maghtou_exc = etr_ghati_maghtou_exc	if etr_ghati_maghtou_exc > 0, nq(100) by(actyear)
+astile percentile_g_maghtou_exc = profit_ghati_maghtou_exc	if profit_ghati_maghtou_exc > 0, nq(100) by(actyear)
 
 // astile p100_decile  = profit_ghati_cal	if percentile_g == 100  , nq(10) by(actyear)
 
