@@ -54,6 +54,9 @@ do "ETR/time_series_output.do"
 do "Exemption&Sector/data_preparations-2.do"
 do "Exemption&Sector/add_province_id.do"
 
+do "Exemption&Sector/create_helper_frames.do"
+
+
 
 global year 1400
 do "Exemption&Sector/exemption_analysis_agr.do"
