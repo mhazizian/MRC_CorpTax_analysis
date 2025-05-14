@@ -21,7 +21,7 @@ frame change graph_frame_g
 	drop if profit_ghati_cal == 0
 	drop if profit_ghati_cal < 0
 	
-	sort percentile_g p100_decile
+	sort percentile_g // p100_decile
 	
 	replace zero_rate_percent_ghati_s = zero_rate_percent_ghati_s * 100
 	replace low_rate_percent_ghati_s = low_rate_percent_ghati_s * 100

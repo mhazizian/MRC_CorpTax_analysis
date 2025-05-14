@@ -17,12 +17,13 @@ graph drop _all
 
 global is_sharif_version 0
 global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-global out_dir "./out/no-maghtou"
+// global dir "~\Documents\Majlis RC\data\tax_return\sharif"
+// global dir "D:\Data_Output\Hoghooghi"
 
 global geo_dir "~/Documents/Data/geo_data"
 
-// global dir "~\Documents\Majlis RC\data\tax_return\sharif"
-// global dir "D:\Data_Output\Hoghooghi"
+global out_dir "./out"
+// global out_dir "./out/maghtou_income_excluded"
 
 
 
@@ -51,9 +52,11 @@ do "ETR/time_series_output.do"
 // Amend dataSet:
 
 do "Exemption&Sector/data_preparations-2.do"
+do "Exemption&Sector/add_province_id.do"
 
 
 global year 1400
+do "Exemption&Sector/exemption_analysis_agr.do"
 do "Exemption&Sector/exemption_analysis.do"
 do "Exemption&Sector/bakhshoodegi_analysis.do"
 
