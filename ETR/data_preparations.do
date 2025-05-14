@@ -93,39 +93,38 @@ tab actyear is_not_audited [w=profit_ebrazi] if profit_ebrazi >= 0, row // 0.07%
 frame create Moafiat_frame
 frame change Moafiat_frame
 
-// local dir "D:\Data_Output\Hoghooghi"
-// local dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
-// local dir "~\Documents\Majlis RC\data\tax_return\sharif"
+	use "$dir\Moafiat.dta", clear
+
+	drop if missing(actyear)
+	local maliat_maghtoo_code 35
+
+	// @@@ Sharif Version.
+	if $is_sharif_version == 1 {
+		rename benefit Exempted_Profit
+		rename new_code exemption_id
+		local maliat_maghtoo_code 37
+		egen trace_id = concat(actyear id), punct(_)
+	}
 
 
-use "$dir\Moafiat.dta", clear
+	// maliat maghtoo:
+	egen agr_maghtou = sum(Exempted_Profit * (exemption_id == `maliat_maghtoo_code')), by(trace_id)
+	drop if exemption_id == `maliat_maghtoo_code'
 
-drop if missing(actyear)
-local maliat_maghtoo_code 35
+	egen agr_moafiat = sum(Exempted_Profit), by(trace_id)
 
-// @@@ Sharif Version.
-if $is_sharif_version == 1 {
-	rename benefit Exempted_Profit
-	rename new_code exemption_id
-	local maliat_maghtoo_code 37
-	egen trace_id = concat(actyear id), punct(_)
-}
+	gen is_tolidi_temp = 0
+	replace is_tolidi_temp = 1 if exemption_id == 2
+	replace is_tolidi_temp = 1 if exemption_id == 13
+	replace is_tolidi_temp = 1 if exemption_id == 5
+	egen is_tolidi_m = max(is_tolidi_temp), by(trace_id)
 
+	gen is_in_free_trade_zones_exm_t = 0
+	replace is_in_free_trade_zones_exm_t = 1 if exemption_id == 22
+	egen is_in_free_trade_zones_exm = max(is_in_free_trade_zones_exm_t), by(trace_id)
 
-// maliat maghtoo:
-
-egen agr_maghtou = sum(Exempted_Profit * (exemption_id == `maliat_maghtoo_code')), by(trace_id)
-drop if exemption_id == `maliat_maghtoo_code'
-
-gen is_tolidi_temp = 0
-replace is_tolidi_temp = 1 if exemption_id == 2
-replace is_tolidi_temp = 1 if exemption_id == 13
-egen is_tolidi_m = max(is_tolidi_temp), by(trace_id)
-
-egen agr_moafiat = sum(Exempted_Profit), by(trace_id)
-
-keep trace_id agr_moafiat agr_maghtou is_tolidi_m
-duplicates drop
+	keep trace_id agr_moafiat agr_maghtou is_tolidi_m is_in_free_trade_zones_exm
+	duplicates drop
 
 frame change default
 frlink 1:1 trace_id, frame(Moafiat_frame)
@@ -133,6 +132,8 @@ frlink 1:1 trace_id, frame(Moafiat_frame)
 frget agr_moafiat, from(Moafiat_frame)
 frget agr_maghtou, from(Moafiat_frame)
 frget is_tolidi_m, from(Moafiat_frame)
+frget is_in_free_trade_zones_exm, from(Moafiat_frame)
+
 
 frame drop Moafiat_frame
 drop Moafiat_frame
@@ -144,21 +145,21 @@ frame change Bakhshodegi_frame
 
 use "$dir\Bakhshhodegi.dta", clear
 
-// @@@ Sharif Version.
-if $is_sharif_version == 1 {
-	rename bakhshoodegiqty Rebate_Amount
-	egen trace_id = concat(actyear id), punct(_)
-}
+	// @@@ Sharif Version.
+	if $is_sharif_version == 1 {
+		rename bakhshoodegiqty Rebate_Amount
+		egen trace_id = concat(actyear id), punct(_)
+	}
 
-gen is_tolidi_temp = 0
-replace is_tolidi_temp = 1 if bakhshoodegi_id == 213
-replace is_tolidi_temp = 1 if bakhshoodegi_id == 214
-egen is_tolidi_b = max(is_tolidi_temp), by(trace_id)
+	gen is_tolidi_temp = 0
+	replace is_tolidi_temp = 1 if bakhshoodegi_id == 213
+	replace is_tolidi_temp = 1 if bakhshoodegi_id == 214
+	egen is_tolidi_b = max(is_tolidi_temp), by(id)
 
-egen agr_bakhshoudegi = sum(Rebate_Amount), by(trace_id)
+	egen agr_bakhshoudegi = sum(Rebate_Amount), by(trace_id)
 
-keep trace_id agr_bakhshoudegi is_tolidi_b
-duplicates drop
+	keep trace_id agr_bakhshoudegi is_tolidi_b
+	duplicates drop
 
 frame change default
 frlink 1:1 trace_id, frame(Bakhshodegi_frame)
@@ -169,6 +170,13 @@ frame drop Bakhshodegi_frame
 drop Bakhshodegi_frame
 
 
+
+// ###### Otagh membership flag ##########
+gen otagh_membership = 0
+replace otagh_membership = 1 if !missing(T26_R13) & T26_R13 > 0
+
+
+
 // Bug fix on 1399:
 // replace agr_maghtou = 0		  if actyear == 1399 & missing(agr_maghtou) 
 // replace agr_moafiat = T26_R04 if actyear == 1399 & T26_R04 > agr_moafiat + agr_maghtou ///
@@ -176,6 +184,7 @@ drop Bakhshodegi_frame
 //	
 // replace agr_maghtou = 0 	  if actyear == 1399 & T26_R04 > agr_moafiat + agr_maghtou ///
 // 	& !missing(T26_R04)
+
 
 
 // ############################## profit Ghati ! #################################
@@ -209,8 +218,6 @@ replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// 
 
 
 
-
-
 // @@@ MRC Version
 if $is_sharif_version == 0 {
     // Maliat Maghtou for 1401
@@ -239,12 +246,19 @@ if T26_R04 > T26_R01 & !missing(T26_R04) & tax_ghati == 0 {
 replace profit_ghati_cal = . if missing(tax_ghati)
 replace profit_ghati_cal = 0 if profit_ghati_cal < 0
 
-// Robustness checke!
-// TODO: check this decision.
-// replace profit_ghati_cal = profit_ghati_cal - agr_maghtou if !missing(agr_maghtou) 		// Maliat Maghtou
 
+// TODO: check this decision.
 replace profit_ghati_cal = profit_ebrazi if profit_ghati_cal < profit_ebrazi ///
 	& !missing(profit_ebrazi)
+
+
+gen profit_ghati_maghtou_exc = profit_ghati_cal
+replace profit_ghati_maghtou_exc = profit_ghati_cal - agr_maghtou if !missing(agr_maghtou) // Maliat Maghtou
+replace profit_ghati_maghtou_exc = 0 if profit_ghati_maghtou_exc < 0
+
+	
+// Robustness checke!
+// replace profit_ghati_cal = profit_ghati_maghtou_exc // Maliat Maghtou
 
 
 
@@ -284,13 +298,15 @@ tab actyear
 
 // ############################## Calculation #################################
 
-gen etr_ebrazi  = tax_ebrazi / profit_ebrazi
-gen etr_ghati  = tax_ghati / profit_ebrazi 
-gen etr_ghati_s = tax_ghati / profit_ghati_cal
+gen etr_ebrazi  			= tax_ebrazi / profit_ebrazi
+gen etr_ghati  				= tax_ghati  / profit_ebrazi 
+gen etr_ghati_s 			= tax_ghati  / profit_ghati_cal
+gen etr_ghati_maghtou_exc 	= tax_ghati  / profit_ghati_maghtou_exc
 
 replace etr_ebrazi = .	 if etr_ebrazi < 0
 replace etr_ghati = . 	 if etr_ghati < 0
 replace etr_ghati_s = .	 if etr_ghati_s < 0
+replace etr_ghati_maghtou_exc = .	 if etr_ghati_maghtou_exc < 0
 
 
 gen etr_ebrazi2 = etr_ebrazi
@@ -345,7 +361,9 @@ drop flag
 // egen percentile_g = xtile(profit_ghati_cal) , by(actyear) nq(100)
 astile percentile 	= profit_ebrazi		if profit_ebrazi > 0	, nq(100) by(actyear)
 astile percentile_g = profit_ghati_cal	if profit_ghati_cal > 0 , nq(100) by(actyear)
-astile p100_decile  = profit_ghati_cal	if percentile_g == 100  , nq(10) by(actyear)
+astile percentile_g_maghtou_exc = etr_ghati_maghtou_exc	if etr_ghati_maghtou_exc > 0, nq(100) by(actyear)
+
+// astile p100_decile  = profit_ghati_cal	if percentile_g == 100  , nq(10) by(actyear)
 
 
 replace profit_ghati_cal = -1 if missing(profit_ghati_cal)	
@@ -372,10 +390,10 @@ egen sum_profit_g_prct_middle_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.2
 egen sum_profit_g_prct_high_rate 		= sum(profit_ghati_cal * (etr_ghati_s <= 0.25)) , by(actyear percentile_g)
 
 
-egen sum_profit_g_p100_d_zero_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.01)) , by(actyear p100_decile)
-egen sum_profit_g_p100_d_low_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.1)) , by(actyear p100_decile)
-egen sum_profit_g_p100_d_middle_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.2)) , by(actyear p100_decile)
-egen sum_profit_g_p100_d_high_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.25)) , by(actyear p100_decile)
+// egen sum_profit_g_p100_d_zero_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.01)) , by(actyear p100_decile)
+// egen sum_profit_g_p100_d_low_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.1)) , by(actyear p100_decile)
+// egen sum_profit_g_p100_d_middle_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.2)) , by(actyear p100_decile)
+// egen sum_profit_g_p100_d_high_rate 		= sum(profit_ghati_cal * (etr_ghati_s < 0.25)) , by(actyear p100_decile)
 
 
 
@@ -386,7 +404,7 @@ egen zero_rate_percent_ghati    = mean(etr_ghati < 0.01)   , by(actyear percenti
 egen zero_rate_percent_ghati_s  = mean(etr_ghati_s < 0.01) , by(actyear percentile_g)
 egen zero_rate_percent_ghati_sw = sum(profit_ghati_cal * (etr_ghati_s < 0.01) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
-egen zero_rate_percent_ghati_s_p100  = mean(etr_ghati_s < 0.01) , by(actyear p100_decile)
+// egen zero_rate_percent_ghati_s_p100  = mean(etr_ghati_s < 0.01) , by(actyear p100_decile)
 	
 label variable zero_rate_percent_ghati_s "سهم شرکت‌های با نرخ موثر قطعی ۰ تا ۱ درصد از کل سود در سال و صدک"
 label variable zero_rate_percent_ebrazi "سهم شرکت‌های با نرخ موثر ابرازی ۰ تا ۱ درصد از کل سود در سال و صدک"
@@ -397,7 +415,7 @@ egen low_rate_percent_ghati    = mean(etr_ghati < 0.1)    , by(actyear percentil
 egen low_rate_percent_ghati_s  = mean(etr_ghati_s < 0.1)  , by(actyear percentile_g)
 egen low_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s < 0.1) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
-egen low_rate_percent_ghati_s_p100  = mean(etr_ghati_s < 0.1)  , by(actyear p100_decile)
+// egen low_rate_percent_ghati_s_p100  = mean(etr_ghati_s < 0.1)  , by(actyear p100_decile)
 
 
 egen middle_rate_percent_ebrazi   = mean(etr_ebrazi < 0.2)	, by(actyear percentile_g)
@@ -405,7 +423,7 @@ egen middle_rate_percent_ghati    = mean(etr_ghati < 0.2)    , by(actyear percen
 egen middle_rate_percent_ghati_s  = mean(etr_ghati_s < 0.2)  , by(actyear percentile_g)
 egen middle_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s < 0.2) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
-egen middle_rate_percent_ghati_s_p100  = mean(etr_ghati_s < 0.2)  , by(actyear p100_decile)
+// egen middle_rate_percent_ghati_s_p100  = mean(etr_ghati_s < 0.2)  , by(actyear p100_decile)
 
 
 egen high_rate_percent_ebrazi   = mean(etr_ebrazi <= 0.25)	, by(actyear percentile_g)
@@ -413,7 +431,7 @@ egen high_rate_percent_ghati    = mean(etr_ghati <= 0.25)    , by(actyear percen
 egen high_rate_percent_ghati_s  = mean(etr_ghati_s <= 0.25)  , by(actyear percentile_g)
 egen high_rate_percent_ghati_sw  = sum(profit_ghati_cal * (etr_ghati_s <= 0.25) / sum_profit_g_percentile) ///
 	, by(actyear percentile_g)
-egen high_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.25)  , by(actyear p100_decile)
+// egen high_rate_percent_ghati_s_p100  = mean(etr_ghati_s <= 0.25)  , by(actyear p100_decile)
 
 
 egen avg_etr_ghati_percentile  = mean(etr_ghati_s), by(actyear percentile_g)
