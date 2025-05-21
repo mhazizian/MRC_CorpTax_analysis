@@ -94,6 +94,7 @@ frame create Moafiat_frame
 frame change Moafiat_frame
 
 	use "$dir\Moafiat.dta", clear
+	duplicates drop
 
 	drop if missing(actyear)
 	local maliat_maghtoo_code 35
@@ -111,6 +112,7 @@ frame change Moafiat_frame
 	egen agr_maghtou = sum(Exempted_Profit * (exemption_id == `maliat_maghtoo_code')), by(trace_id)
 	drop if exemption_id == `maliat_maghtoo_code'
 
+	egen agr_139 = sum(Exempted_Profit * (exemption_id == 32)), by(trace_id)
 	egen agr_moafiat = sum(Exempted_Profit), by(trace_id)
 
 	gen is_tolidi_temp = 0
@@ -123,6 +125,10 @@ frame change Moafiat_frame
 	replace is_in_free_trade_zones_exm_t = 1 if exemption_id == 22
 	egen is_in_free_trade_zones_exm = max(is_in_free_trade_zones_exm_t), by(trace_id)
 
+	gen is_139_temp = 0
+	replace is_139_temp = 1 if exemption_id == 32
+	egen is_139 = max(is_139_temp), by(trace_id)
+
 	keep trace_id agr_moafiat agr_maghtou is_tolidi_m is_in_free_trade_zones_exm
 	duplicates drop
 
@@ -132,6 +138,8 @@ frlink 1:1 trace_id, frame(Moafiat_frame)
 frget agr_moafiat, from(Moafiat_frame)
 frget agr_maghtou, from(Moafiat_frame)
 frget is_tolidi_m, from(Moafiat_frame)
+frget is_139	 , from(Moafiat_frame)
+frget agr_139	 , from(Moafiat_frame)
 frget is_in_free_trade_zones_exm, from(Moafiat_frame)
 
 
@@ -143,7 +151,8 @@ drop Moafiat_frame
 frame create Bakhshodegi_frame
 frame change Bakhshodegi_frame
 
-use "$dir\Bakhshhodegi.dta", clear
+	use "$dir\Bakhshhodegi.dta", clear
+	duplicates drop
 
 	// @@@ Sharif Version.
 	if $is_sharif_version == 1 {
