@@ -129,9 +129,11 @@ frame change Moafiat_frame
 	replace is_139_temp = 1 if exemption_id == 32
 	egen is_139 = max(is_139_temp), by(trace_id)
 
-	keep trace_id agr_moafiat agr_maghtou is_tolidi_m is_in_free_trade_zones_exm
+	keep trace_id agr_moafiat agr_maghtou is_tolidi_m  ///
+			is_in_free_trade_zones_exm agr_139 is_139
 	duplicates drop
 
+	
 frame change default
 frlink 1:1 trace_id, frame(Moafiat_frame)
 
