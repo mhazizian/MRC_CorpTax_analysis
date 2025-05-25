@@ -14,15 +14,20 @@ frame reset
 graph set window fontface "B Nazanin"
 graph drop _all
 
+global geo_dir "~/Documents/Data/geo_data"
 
+
+global include_aastan 0
+global include_139 1
+global include_maghtou 1
 global is_sharif_version 0
+
 global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 // global dir "~\Documents\Majlis RC\data\tax_return\sharif"
 // global dir "D:\Data_Output\Hoghooghi"
 
-global geo_dir "~/Documents/Data/geo_data"
 
-global out_dir "./out"
+global out_dir "./out__M${include_maghtou}_C${include_139}_A${include_aastan}"
 // global out_dir "./out/maghtou_income_excluded"
 
 

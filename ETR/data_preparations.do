@@ -49,6 +49,17 @@ replace tax_tashkhisi = 0 if tax_tashkhisi  < 10000 & tax_tashkhisi > 0
 replace tax_ghati	  = 0 if tax_ghati 		< 10000 & tax_ghati > 0
 replace profit_ebrazi = 0 if profit_ebrazi  < 10000 & profit_ebrazi > 0
 
+if $include_aastan == 0 {
+	drop if id == 10086144
+	drop if id == 10119367	
+	drop if id == 10261430
+	drop if id == 10202678
+	drop if id == 10020511
+	drop if id == 10058462
+	drop if id == 10018244
+	
+}
+
 
 // ############################ Not Audited cases ################################
 
@@ -268,9 +279,15 @@ replace profit_ghati_maghtou_exc = profit_ghati_cal - agr_maghtou if !missing(ag
 replace profit_ghati_maghtou_exc = 0 if profit_ghati_maghtou_exc < 0
 
 	
-// Robustness checke!
-// replace profit_ghati_cal = profit_ghati_maghtou_exc // Maliat Maghtou
+if $include_maghtou == 0 {
+	// Robustness checke!
+	replace profit_ghati_cal = profit_ghati_maghtou_exc // Maliat Maghtou	
+}
 
+
+if $include_139 == 0 {
+	replace profit_ghati_cal = profit_ghati_cal - agr_139 if !missing(agr_139)
+}
 
 
 // ############################# Cleaning phase 2 ####################################
