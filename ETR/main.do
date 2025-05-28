@@ -17,7 +17,7 @@ graph drop _all
 global geo_dir "~/Documents/Data/geo_data"
 
 
-global include_aastan 0
+global include_aastan 1
 global include_139 1
 global include_maghtou 1
 global is_sharif_version 0
@@ -41,8 +41,9 @@ use "$out_dir/dta/corp_cleaned_data_isSharif$is_sharif_version.dta", clear
 
 // ####### Yearly Charts ##############
 
-global year 1400
+global year 1401
 do "ETR/graph_drawer.do"
+
 
 // ####### Time Series  ###############
 
@@ -59,8 +60,9 @@ do "ETR/time_series_output.do"
 do "Exemption&Sector/data_preparations-2.do"
 do "Exemption&Sector/add_province_id.do"
 
-do "Exemption&Sector/create_helper_frames.do"
 
+global drop_frame 1
+do "Exemption&Sector/create_helper_frames.do"
 
 
 global year 1400
