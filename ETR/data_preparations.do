@@ -238,6 +238,7 @@ replace profit_ghati_cal = profit_ghati_cal + T26_R04 if !missing(T26_R04) 		// 
 // replace profit_ghati_cal = profit_ghati_cal + agr_moafiat if !missing(agr_moafiat) 	// Moafiat
 // replace profit_ghati_cal = profit_ghati_cal + agr_maghtou if !missing(agr_maghtou) 		// Maliat Maghtou
 
+replace profit_ghati_cal = profit_ghati_cal + maghtou_taxable_income if !missing(maghtou_taxable_income) 		// Maghtou for years in 1401, 1402
 
 
 // @@@ MRC Version
@@ -276,6 +277,8 @@ replace profit_ghati_cal = profit_ebrazi if profit_ghati_cal < profit_ebrazi ///
 
 gen profit_ghati_maghtou_exc = profit_ghati_cal
 replace profit_ghati_maghtou_exc = profit_ghati_cal - agr_maghtou if !missing(agr_maghtou) // Maliat Maghtou
+replace profit_ghati_maghtou_exc = profit_ghati_cal - maghtou_taxable_income ///
+		if !missing(maghtou_taxable_income) // Maliat Maghtou for years in 1401, 1402
 replace profit_ghati_maghtou_exc = 0 if profit_ghati_maghtou_exc < 0
 
 	
