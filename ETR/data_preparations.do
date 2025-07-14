@@ -130,11 +130,11 @@ frame change Moafiat_frame
 	replace is_tolidi_temp = 1 if exemption_id == 2
 	replace is_tolidi_temp = 1 if exemption_id == 13
 	replace is_tolidi_temp = 1 if exemption_id == 5
-	egen is_tolidi_m = max(is_tolidi_temp), by(trace_id)
+	egen is_tolidi_m = max(is_tolidi_temp), by(id)
 
 	gen is_in_free_trade_zones_exm_t = 0
 	replace is_in_free_trade_zones_exm_t = 1 if exemption_id == 22
-	egen is_in_free_trade_zones_exm = max(is_in_free_trade_zones_exm_t), by(trace_id)
+	egen is_in_free_trade_zones_exm = max(is_in_free_trade_zones_exm_t), by(id)
 
 	gen is_139_temp = 0
 	replace is_139_temp = 1 if exemption_id == 32
