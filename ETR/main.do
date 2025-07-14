@@ -66,6 +66,9 @@ do "Exemption&Sector/create_helper_frames.do"
 
 
 global year 1400
+do "Exemption&Sector/tax_exp_components_anlys.do"
+
+
 do "Exemption&Sector/exemption_analysis_agr.do"
 do "Exemption&Sector/exemption_analysis.do"
 do "Exemption&Sector/bakhshoodegi_analysis.do"
