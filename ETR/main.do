@@ -38,6 +38,14 @@ do "./identify_corporates.do"
 save "$out_dir/dta/corp_cleaned_data_isSharif$is_sharif_version.dta", replace
 use "$out_dir/dta/corp_cleaned_data_isSharif$is_sharif_version.dta", clear
 
+//
+// gen eq_total_exemption = agr_moafiat
+// replace eq_total_exemption = eq_total_exemption - agr_maghtou if !missing(agr_maghtou)
+// replace eq_total_exemption = eq_total_exemption + (agr_bakhshoudegi * 4) if !missing(agr_bakhshoudegi)
+//
+// gen is_high_exemption = (eq_total_exemption > 500 * 1000 * 1000 * 1000 & !missing(eq_total_exemption))
+
+
 
 // ####### Yearly Charts ##############
 
@@ -57,11 +65,12 @@ do "ETR/time_series_output.do"
 // @ MRC data
 // Amend dataSet:
 
-do "Exemption&Sector/data_preparations-2.do"
-do "Exemption&Sector/add_province_id.do"
+
+// do "Exemption&Sector/data_preparations-2.do"
+// do "Exemption&Sector/add_province_id.do"
 
 
-global drop_frame 1
+global drop_frame 0
 do "Exemption&Sector/create_helper_frames.do"
 
 

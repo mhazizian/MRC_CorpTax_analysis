@@ -198,6 +198,10 @@ gen otagh_membership = 0
 replace otagh_membership = 1 if !missing(T26_R13) & T26_R13 > 0
 
 
+gen eq_total_exemption = agr_moafiat
+replace eq_total_exemption = eq_total_exemption - agr_maghtou if !missing(agr_maghtou)
+replace eq_total_exemption = eq_total_exemption + (agr_bakhshoudegi * 4) if !missing(agr_bakhshoudegi)
+
 
 // Bug fix on 1399:
 // replace agr_maghtou = 0		  if actyear == 1399 & missing(agr_maghtou) 

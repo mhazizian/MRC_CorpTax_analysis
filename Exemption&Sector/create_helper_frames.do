@@ -179,7 +179,7 @@ frame change Bakhshodegi_frame
 	gen bakhshoodegi_description2 = bakhshoodegi_description
 	label copy temp bakhsh_desc_label
 	
-	label define bakhsh_desc_label 3 "کاهش نرخ واحد های تولیدی در بودجه", modify
+	label define bakhsh_desc_label 3 "کاهش نرخ تولیدی ‌ها در بودجه", modify
 	label define bakhsh_desc_label 5 "تبصره ۷ ماده ۱۰۵", modify
 	label define bakhsh_desc_label 13 "کاهش نرخ بورسی‌ها", modify
 	label values bakhshoodegi_description2 bakhsh_desc_label

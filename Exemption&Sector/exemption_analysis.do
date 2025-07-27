@@ -1,49 +1,56 @@
-frame change default
-graph set window fontface "B Nazanin"
+// frame change default
+// graph set window fontface "B Nazanin"
+//
+// graph drop _all
+// graph set svg fontface "B Nazanin"
+//
+//
+// frame create Moafiat_frame
+// frame change Moafiat_frame
+//
+//
+// use "$dir\Moafiat.dta", clear
+//
+// drop if missing(actyear)
+// local maliat_maghtoo_code 35
+//
+// // @@@ Sharif Version.
+// if $is_sharif_version == 1 {
+// 	rename benefit Exempted_Profit
+// 	rename new_code exemption_id
+// 	local maliat_maghtoo_code 37
+// 	egen trace_id = concat(actyear id), punct(_)
+// 	rename activity exemption_description
+// 	replace exemption_description = ""
+// }
+//
+//
+// frlink m:1 trace_id		, frame(default)
+// frget percentile_g		, from(default)
+// // frget percentile		, from(default)
+// frget etr_ghati_s		, from(default)
+// frget etr_ghati_s2		, from(default)
+// frget etr_ebrazi		, from(default)
+// frget profit_ebrazi		, from(default)
+// frget profit_ghati_cal	, from(default)
+// frget tax_ghati			, from(default)
+// frget T00_ActivityType	, from(default)
+// frget T00_ActivityTypeName	, from(default)
+//
+//
+// sort percentile_g
+//
+// label define temp 27 "فعالیت‌های تولیدی و معدنی (ماده ۱۳۲ ق‌م‌م)", modify
+// label define temp 20 "سود سپرده و جوایز بانک‌ها و موسسات اعتباری غیربانکی مجاز (ماده ۱۴۵ ق‌م‌م‌)", modify
+// label define temp 9 "درآمد حاصل از صادرات خدمات و کالاهای غیرنفتی (صدر ماده ۱۴۱ ق‌م‌م)", modify
+// label values exemption_description temp
 
-graph drop _all
-graph set svg fontface "B Nazanin"
-
-
-frame create Moafiat_frame
 frame change Moafiat_frame
 
 
-use "$dir\Moafiat.dta", clear
+// top20
+foreach exm_desc_id in 27 39 9 20 24 53 21 26 {
 
-drop if missing(actyear)
-local maliat_maghtoo_code 35
-
-// @@@ Sharif Version.
-if $is_sharif_version == 1 {
-	rename benefit Exempted_Profit
-	rename new_code exemption_id
-	local maliat_maghtoo_code 37
-	egen trace_id = concat(actyear id), punct(_)
-	rename activity exemption_description
-	replace exemption_description = ""
-}
-
-
-frlink m:1 trace_id		, frame(default)
-frget percentile_g		, from(default)
-// frget percentile		, from(default)
-frget etr_ghati_s		, from(default)
-frget etr_ghati_s2		, from(default)
-frget etr_ebrazi		, from(default)
-frget profit_ebrazi		, from(default)
-frget profit_ghati_cal	, from(default)
-frget tax_ghati			, from(default)
-frget T00_ActivityType	, from(default)
-frget T00_ActivityTypeName	, from(default)
-
-
-sort percentile_g
-
-label define temp 27 "فعالیت‌های تولیدی و معدنی (ماده ۱۳۲ ق‌م‌م)", modify
-label define temp 20 "سود سپرده و جوایز بانک‌ها و موسسات اعتباری غیربانکی مجاز (ماده ۱۴۵ ق‌م‌م‌)", modify
-label define temp 9 "درآمد حاصل از صادرات خدمات و کالاهای غیرنفتی (صدر ماده ۱۴۱ ق‌م‌م)", modify
-label values exemption_description temp
 
 // top20
 // foreach exm_desc_id in 27 19 39 9 20 22 24 26 21 31 {
@@ -55,7 +62,7 @@ label values exemption_description temp
 // foreach exm_desc_id in 27 2 15 4 5 17 3 {
 
 // knowledge base corporates
-foreach exm_desc_id in 22 40 {
+// foreach exm_desc_id in 22 40 {
 
 
 	frame copy Moafiat_frame Moafiat_frame_temp, replace

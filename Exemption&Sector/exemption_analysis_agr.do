@@ -31,6 +31,10 @@ foreach state in 1 2 3 4 {
 		local title "۲۰۰ شرکت بزرگ"
 		keep if top200 == 1
 	}
+	if `state' == 4 {
+		local title "شرکت‌های تولیدی'"
+		keep if is_tolidi_b == 1 | is_tolidi_m == 1
+	}
 	
 
 	// ########### Collapse database

@@ -7,7 +7,7 @@ graph set svg fontface "B Nazanin"
 
 // #####################################################
 
-foreach state in 1 2 3 4 5 6 7 {
+foreach state in 1 2 3 4 5 6 7 8 {
 	
 	frame copy Combined Combined_temp, replace
 	frame change Combined_temp
@@ -17,7 +17,7 @@ foreach state in 1 2 3 4 5 6 7 {
 	drop if exemption_id == $maliat_maghtoo_code
 	
 	if `state' == 1 {
-		local title "همه شرکت‌ها"
+		local title ""
 	}
 	if `state' == 2 {
 		local title "شرکت‌های صدک ۱۰۰ام"
@@ -43,6 +43,13 @@ foreach state in 1 2 3 4 5 6 7 {
 		local title "مناطق آزاد تجاری - صنعتی"
 		keep if is_in_free_trade_zones_exm == 1
 	}
+	if `state' == 8 {
+		local title "دارای مجموع معافیت بیش‌از ۵۰۰ میلیارد ریال"
+		egen lost_income_by_corp = sum(real_lost_income), by(id actyear)
+		keep if !missing(lost_income_by_corp)
+		keep if lost_income_by_corp > 125 * 1000 * 1000 * 1000
+	}
+	
 	
 
 	// ########### Collapse database
@@ -110,7 +117,7 @@ foreach state in 1 2 3 4 5 6 7 {
 			if (order < `exm_count' | order == 1000), ///
 		over(description) ///
 		sort(order) ///
-		title(توزیع درآمد معاف از مالیات در انواع معافیت‌های مالیاتی - سال $year, size(large)) ///
+		title(توزیع مالیات از دست رفته دولت به تفکیک مهم ترین مصارف - سال $year, size(large)) ///
 		subtitle(`title') ///
 		legend(rows(4) symxsize(*1.5) size(*1.2) ring(1) pos(6)) ///
 		plabel(1 percent, format(%2.0f) color(black) gap(-12)) ///
@@ -134,7 +141,7 @@ foreach state in 1 2 3 4 5 6 7 {
 			if (order < `exm_count' | order == 1000), ///
 		over(description) ///
 		sort(order) ///
-		title(تعداد شرکت‌های استفاده کننده از معافیت - سال $year, size(large)) ///
+		title(توزیع شرکت‌های بهره‌مند از مشوق مالیاتی به تفکیک مشوق‌ها - سال $year, size(large)) ///
 		subtitle(`title') ///
 		legend(rows(4) symxsize(*1.5) size(*1.2) ring(1) pos(6)) ///
 		plabel(1 percent, format(%2.0f) color(black) gap(-12)) ///
