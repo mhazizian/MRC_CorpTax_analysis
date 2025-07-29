@@ -45,7 +45,7 @@ foreach state in 1 2 3 4 5 6 7 8 {
 	}
 	if `state' == 8 {
 		local title "دارای مجموع معافیت بیش‌از ۵۰۰ میلیارد ریال"
-		egen lost_income_by_corp = sum(real_lost_income), by(id actyear)
+		egen lost_income_by_corp = sum(real_lost_income), by(trace_id)
 		keep if !missing(lost_income_by_corp)
 		keep if lost_income_by_corp > 125 * 1000 * 1000 * 1000
 	}
@@ -55,32 +55,32 @@ foreach state in 1 2 3 4 5 6 7 8 {
 	// ########### Collapse database
 	
 	gen count = 1
-	gen count_m = !missing(exemption_id)
-	gen count_b = !missing(bakhshoodegi_id)
+	gen count_m = !missing(exemption_id) 		// number of corporates using this exemption
+	gen count_b = !missing(bakhshoodegi_id)		// numbrt of corporates using this bakhshoodgi
 	collapse (sum) lost_income real_lost_income count count_b count_m, ///
 			by(description exemption_description exemption_id bakhshoodegi_description bakhshoodegi_id actyear)
 			
 			
-	egen total_exp = sum(lost_income), by(actyear)
-	gen exp_share = lost_income / total_exp * 100
+	egen total_tax_exp = sum(lost_income), by(actyear)
+	gen tax_exp_share = lost_income / total_tax_exp * 100
 	gsort -real_lost_income
-	order actyear lost_income real_lost_income exp_share count_b count_m description *
+	order actyear lost_income real_lost_income tax_exp_share count_b count_m description *
 
 	
-// 	graph twoway line exp_share actyear ///
-// 		if description == 43 ///
-// 		| description == 59 ///
-// 		| description == 46 ///
-// 		| description == 16 ///
-// 		| description == 30 ///
-// 		| description == 8 ///
-// 		, sort by(description)
-//	
+	graph twoway line tax_exp_share actyear ///
+		if description == 43 ///
+		| description == 59 ///
+		| description == 46 ///
+		| description == 16 ///
+		| description == 30 ///
+		| description == 8 ///
+		, sort by(description)
+	
 	
 	
 // 	twoway ///
-// 		(line  exp_share actyear if exemption_description == 27, sort) ///
-// 		(line  exp_share actyear if exemption_description == 30, sort), ///
+// 		(line  tax_exp_share actyear if exemption_description == 27, sort) ///
+// 		(line  tax_exp_share actyear if exemption_description == 30, sort), ///
 // 		legend(pos(6) rows(1)) ///
 // 		ylab(, grid) xlab(, grid) ///
 // 		ytitle(متوسط نرخ مالیات موثر شرکت, size(medium)) ///
@@ -90,7 +90,7 @@ foreach state in 1 2 3 4 5 6 7 8 {
 //		
 		
 		
-// 	graph twoway line  exp_share actyear if exemption_description == 27, sort
+// 	graph twoway line  tax_exp_share actyear if exemption_description == 27, sort
 	
 	
 	
