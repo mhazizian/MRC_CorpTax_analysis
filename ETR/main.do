@@ -17,19 +17,20 @@ graph drop _all
 global geo_dir "~/Documents/Data/geo_data"
 
 
+// flags for ETR calculation:
 global include_aastan 1
 global include_139 1
 global include_maghtou 1
+
 global is_sharif_version 0
 
-global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
+// global dir "~\Documents\Majlis RC\data\tax_return\Hoghooghi"
 // global dir "~\Documents\Majlis RC\data\tax_return\sharif"
-// global dir "D:\Data_Output\Hoghooghi"
+global dir "D:\Data_Output\Hoghooghi"
+// global dir "D:\Data_Output\Hoghooghi\sharif"
 
 
 global out_dir "./out__M${include_maghtou}_C${include_139}_A${include_aastan}"
-// global out_dir "./out/maghtou_income_excluded"
-
 
 
 do "ETR/data_preparations.do"
@@ -49,7 +50,7 @@ use "$out_dir/dta/corp_cleaned_data_isSharif$is_sharif_version.dta", clear
 
 // ####### Yearly Charts ##############
 
-global year 1401
+global year 1400
 do "ETR/graph_drawer.do"
 
 
@@ -76,6 +77,10 @@ do "Exemption&Sector/create_helper_frames.do"
 
 global year 1400
 do "Exemption&Sector/tax_exp_components_anlys.do"
+
+
+
+
 
 
 do "Exemption&Sector/exemption_analysis_agr.do"

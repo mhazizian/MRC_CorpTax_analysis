@@ -49,7 +49,7 @@ replace tax_tashkhisi = 0 if tax_tashkhisi  < 10000 & tax_tashkhisi > 0
 replace tax_ghati	  = 0 if tax_ghati 		< 10000 & tax_ghati > 0
 replace profit_ebrazi = 0 if profit_ebrazi  < 10000 & profit_ebrazi > 0
 
-if $include_aastan == 0 {
+if $include_aastan == 0 & $is_sharif_version == 0 {
 	drop if id == 10086144
 	drop if id == 10119367	
 	drop if id == 10261430
@@ -57,7 +57,11 @@ if $include_aastan == 0 {
 	drop if id == 10020511
 	drop if id == 10058462
 	drop if id == 10018244
-	
+}
+
+if $include_aastan == 0 & $is_sharif_version == 1 {
+	drop if id == 447104
+	drop if id == 53070
 }
 
 
@@ -171,6 +175,11 @@ frame change Bakhshodegi_frame
 	if $is_sharif_version == 1 {
 		rename bakhshoodegiqty Rebate_Amount
 		egen trace_id = concat(actyear id), punct(_)
+		
+		rename bakhshoodegi_code bakhshoodegi_id
+		replace bakhshoodegi_id = 213 if bakhshoodegi_id == 8
+		replace bakhshoodegi_id = 213 if bakhshoodegi_id == 7
+
 	}
 
 	gen is_tolidi_temp = 0
