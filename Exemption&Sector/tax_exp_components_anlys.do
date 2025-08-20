@@ -77,17 +77,23 @@ foreach state in 1 2 3 4 5 6 7 8 {
 		, sort by(description)
 	
 	
-	
-// 	twoway ///
-// 		(line  tax_exp_share actyear if exemption_description == 27, sort) ///
-// 		(line  tax_exp_share actyear if exemption_description == 30, sort), ///
-// 		legend(pos(6) rows(1)) ///
-// 		ylab(, grid) xlab(, grid) ///
-// 		ytitle(متوسط نرخ مالیات موثر شرکت, size(medium)) ///
-// 		xtitle(صدک شرکت, size(medium)) ///
-// 		title(متوسط نرخ موثر مالیات در هر صدک -‍ سال $year, size(large)) ///
-// 		xscale(titlegap(2.5)) yscale(titlegap(1.5))
-//		
+	preserve
+	keep if actyear > 1391
+	keep if actyear < 1401
+	twoway ///
+		(line  tax_exp_share actyear if exemption_description == 27, sort) ///
+		(line  tax_exp_share actyear if exemption_description == 30, sort) ///
+		(line  tax_exp_share actyear if exemption_description == 19, sort) ///
+		(line  tax_exp_share actyear if exemption_description == 39, sort) ///
+		(line  tax_exp_share actyear if bakhshoodegi_description == 39, sort), ///
+		legend(label(1 "معافیت‌های تولیدی معدنی") label(2 "درآمد مقطوع") label(3 "سایر معافیت ها") label(4 "هدایا و درآمد‌ها (م ۱۳۹)") pos(6) rows(1)) ///
+		ylab(, grid) xlab(, grid) ///
+		ytitle(سهم از کل مخارج مالیاتی, size(medium)) ///
+		xtitle(سال, size(medium)) ///
+		title(متوسط نرخ موثر مالیات در هر صدک -‍ سال $year, size(large)) ///
+		xscale(titlegap(2.5)) yscale(titlegap(1.5))
+	restore
+		
 		
 		
 // 	graph twoway line  tax_exp_share actyear if exemption_description == 27, sort
